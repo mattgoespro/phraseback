@@ -1,0 +1,23 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "usernamehw.errorlens",
+    "dbaeumer.vscode-eslint",
+    "felipecaputo.git-project-manager",
+    "herrmannplatz.npm-dependency-links",
+    "christian-kohler.npm-intellisense",
+    "mskelton.npm-outdated",
+    "fabiospampinato.vscode-open-in-npm",
+    "esbenp.prettier-vscode",
+    "yoavbls.pretty-ts-errors",
+    "richie5um2.vscode-sort-json",
+    "meganrogge.template-string-converter",
+    "vscode-icons-team.vscode-icons",
+    "davidanson.vscode-markdownlint",
+    "yzhang.markdown-all-in-one",
+    "naumovs.color-highlight",
+    "kamikillerto.vscode-colorize",
+    "redhat.vscode-yaml"
+  ]
+}

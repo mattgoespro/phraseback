@@ -1,0 +1,44 @@
+# Local build, toolchain, test data and release outputs
+/.tmp/*
+!/.tmp/.gitkeep
+/dist/
+/app/electron/node_modules/
+/app/electron/dist/
+/build-*/
+/dist-*/
+**/bin/
+**/obj/
+**/target/
+**/TestResults/
+**/coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+# IDE and per-user state
+.vs/
+.idea/
+*.csproj.user
+*.suo
+*.sln.docstates
+*.userosscache
+*.sln.ide
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local secrets (templates remain versioned)
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pfx
+*.p12
+*.snk
+
+# Legacy rollback material and accidental expanded Windows cache paths
+/reference-backups/
+/%SystemDrive%/
+__pycache__/
+*.py[cod]
+# Cargo.lock, NuGet lockfiles, schemas, fixtures and vendored notices are source inputs.

@@ -1,0 +1,250 @@
+<Window xmlns="https://github.com/avaloniaui" xmlns:local="using:Phraseback.App" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="Phraseback.App.MainWindow" Title="Phraseback" Width="1280" Height="800" MinWidth="1024" MinHeight="700" Background="{DynamicResource CanvasBrush}">
+  <Grid ColumnDefinitions="56,*" Background="{DynamicResource CanvasBrush}">
+    <Border Background="{DynamicResource LibraryBrush}">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="7,12">
+        <StackPanel Spacing="12">
+          <Border Background="{DynamicResource TideBrush}" CornerRadius="7" Width="30" Height="30" Margin="0,0,0,16">
+            <TextBlock Text="P" Foreground="{DynamicResource AccentTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <Button x:Name="NewRecordingNavigation" Content="＋" FontSize="22" Click="RecordingClick" ToolTip.Tip="New recording" AutomationProperties.Name="New recording" />
+          <Button x:Name="RecordingsNavigation" Content="▤" FontSize="20" Click="RecordingSelectorClick" ToolTip.Tip="Recordings" AutomationProperties.Name="Recordings" />
+        </StackPanel>
+        <Button Grid.Row="2" x:Name="SettingsNavigation" Content="⚙" FontSize="20" Click="SettingsClick" ToolTip.Tip="Settings" AutomationProperties.Name="Settings" />
+      </Grid>
+    </Border>
+    <Grid Grid.Column="1" RowDefinitions="46,Auto,*">
+      <Border Background="{DynamicResource LibraryBrush}">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Margin="12,5">
+          <Button x:Name="NavigationToggle" Content="☰" Classes="subtle" Click="NavigationToggleClick" AutomationProperties.Name="Open navigation" IsVisible="False" />
+          <Border Grid.Column="1" Background="{DynamicResource TideBrush}" Width="24" Height="24" CornerRadius="7" VerticalAlignment="Center" IsVisible="False">
+            <TextBlock Text="P" Foreground="{DynamicResource AccentTextBrush}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="5">
+            <TextBlock Text="Phraseback" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,18,0" />
+            <Button x:Name="RecordingSelector" Classes="subtle" Click="RecordingSelectorClick" AutomationProperties.Name="Choose recording" MaxWidth="300" HorizontalContentAlignment="Left">
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <TextBlock Text="{Binding RecordingSelectorLabel}" TextTrimming="CharacterEllipsis" MaxWidth="250" VerticalAlignment="Center" />
+                <Path Data="M 2,4 L 6,8 L 10,4" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.5" StrokeLineCap="Round" Width="12" Height="12" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            <TextBlock Text="/" Classes="muted" VerticalAlignment="Center" />
+            <TextBlock Text="Ready to record" FontWeight="SemiBold" VerticalAlignment="Center" Margin="4,0,0,0" x:Name="StageLabel" />
+          </StackPanel>
+          <Button Grid.Column="3" x:Name="MoreToggle" Content="⋯" Classes="subtle" Click="MoreToggleClick" AutomationProperties.Name="More actions" />
+          <Popup x:Name="NavigationPopup" PlacementTarget="{Binding #NavigationToggle}" Placement="Bottom" IsLightDismissEnabled="True">
+            <Border Classes="menu-surface" Padding="5" BoxShadow="0 14 35 0 #99000000">
+              <StackPanel Spacing="3">
+                <Button Content="＋  New recording" Classes="menu-option" Click="RecordingClick" HorizontalContentAlignment="Left" AutomationProperties.Name="＋ New recording" />
+                <Button Content="Settings" Classes="menu-option" Click="SettingsClick" HorizontalContentAlignment="Left" />
+              </StackPanel>
+            </Border>
+          </Popup>
+          <Popup x:Name="RecordingPopup" PlacementTarget="{Binding #RecordingSelector}" Placement="Bottom" IsLightDismissEnabled="True">
+            <Border Classes="menu-surface" Padding="5" BoxShadow="0 14 35 0 #99000000">
+              <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
+                <TextBlock Text="Recordings" Classes="muted" Margin="8,4" />
+                <ListBox Grid.Row="1" x:Name="LibraryList" Classes="recording-picker" ItemsSource="{Binding Library}" SelectionChanged="LibraryChanged" MaxHeight="360" MinWidth="180" MaxWidth="300" Background="Transparent" BorderThickness="0" AutomationProperties.Name="Recordings">
+                  <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                      <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+                      <Setter Property="BorderThickness" Value="0" />
+                      <Setter Property="CornerRadius" Value="4" />
+                    </Style>
+                  </ListBox.Styles>
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" Margin="8,5" />
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Grid.Row="2" Content="Load more recordings" Classes="menu-option" Click="LoadMoreClick" IsVisible="{Binding HasMoreRecordings}" IsEnabled="{Binding CanLoadMore}" HorizontalAlignment="Stretch" />
+              </Grid>
+            </Border>
+          </Popup>
+          <Popup x:Name="MorePopup" PlacementTarget="{Binding #MoreToggle}" Placement="Bottom" IsLightDismissEnabled="True">
+            <Border Classes="menu-surface" Padding="5" BoxShadow="0 14 35 0 #99000000">
+              <StackPanel Spacing="2">
+                <Button x:Name="InspectorToggle" Content="Edit descriptions" Classes="menu-option" Click="InspectorToggleClick" AutomationProperties.Name="Show or hide moment details" />
+                <Button Content="Recording details" Classes="menu-option" Click="DetailsClick" IsEnabled="{Binding HasProject}" AutomationProperties.Name="Details" />
+                <Button Content="View original pixels" Classes="menu-option" Click="OriginalClick" IsEnabled="{Binding HasProject}" />
+                <Button Content="Organize" Classes="menu-option" Click="OrganizeClick" IsEnabled="{Binding CanOrganize}" />
+                <Button Content="Export" Classes="menu-option" Click="ExportClick" IsEnabled="{Binding CanCurate}" />
+              </StackPanel>
+            </Border>
+          </Popup>
+        </Grid>
+      </Border>
+      <WrapPanel Grid.Row="1" Margin="24,4,24,0">
+        <TextBlock Text="{Binding StatusLine}" IsVisible="{Binding Busy}" Classes="muted" TextTrimming="CharacterEllipsis" MaxWidth="380" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <TextBlock Text="{Binding Error}" IsVisible="{Binding HasError}" Foreground="{DynamicResource ErrorBrush}" TextTrimming="CharacterEllipsis" MaxWidth="380" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <TextBlock Text="Draft not saved" IsVisible="{Binding HasUnsavedDraft}" Foreground="{DynamicResource ErrorBrush}" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <Button Content="Save draft" Click="SaveClick" IsVisible="{Binding HasUnsavedDraft}" IsEnabled="{Binding IsConnected}" />
+        <Button x:Name="ReconnectButton" Content="Reconnect" Click="ReconnectClick" IsVisible="{Binding CanReconnect}" />
+        <Button x:Name="RecoveryConflictButton" Content="Use saved version…" Click="RecoveryConflictClick" IsVisible="{Binding RecoveryConflict}" IsEnabled="{Binding CanReconnect}" />
+        <Button Content="Cancel" Click="CancelClick" IsVisible="{Binding CanCancel}" />
+      </WrapPanel>
+      <Grid Grid.Row="2">
+        <ContentControl x:Name="ReadyPage" />
+        <Grid x:Name="RecordingPage" IsVisible="False" Margin="24,24,24,20" RowDefinitions="Auto,*,Auto" RowSpacing="24">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Recording your screen" FontSize="24" FontWeight="SemiBold" />
+            <TextBlock Grid.Column="1" x:Name="RecordingElapsed" Text="Preparing recording…" Classes="muted" VerticalAlignment="Center" />
+          </Grid>
+          <Grid Grid.Row="1" ColumnDefinitions="*,260" ColumnSpacing="28">
+            <Border Background="{DynamicResource PreviewBrush}" CornerRadius="7" Padding="10">
+              <Grid>
+                <Image Source="{Binding CapturePreview}" Stretch="Uniform" IsVisible="{Binding HasCapturePreview}" AutomationProperties.Name="Latest captured screen evidence" />
+                <TextBlock Text="Waiting for the first saved frame…" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasCapturePreview}" />
+              </Grid>
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="16" Margin="0,16">
+              <TextBlock Text="Recording in progress" FontSize="18" FontWeight="SemiBold" />
+              <TextBlock Text="Walk through the actions you want the agent to understand. Review opens immediately after you stop." Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="{Binding Activity}" Classes="muted" TextWrapping="Wrap" />
+              <TextBlock Text="Original frames stay on this computer." Classes="muted" FontSize="12" TextWrapping="Wrap" />
+            </StackPanel>
+          </Grid>
+          <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <TextBlock Text="Stop with Ctrl+Shift+F9 or the floating Stop button." Classes="muted" VerticalAlignment="Center" />
+            <Button Grid.Column="1" Content="Stop recording" Classes="recording" Click="StopRecordingClick" MinWidth="180" />
+          </Grid>
+        </Grid>
+        <Grid x:Name="ReviewPage" RowDefinitions="*,Auto" IsVisible="False">
+          <Grid x:Name="ReviewBody" ColumnDefinitions="*,5,320">
+            <Grid x:Name="StudioGrid">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="400" />
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition Width="0" MinWidth="0" MaxWidth="440" />
+              </Grid.ColumnDefinitions>
+              <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Margin="24,17,20,14" RowSpacing="11">
+                <Grid RowDefinitions="Auto,Auto,Auto">
+                  <TextBlock Text="{Binding ProjectTitle}" FontSize="21" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Row="1" Text="{Binding RecordingInfo}" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis" />
+                </Grid>
+                <Border x:Name="EvidencePreviewPanel" Grid.Row="1" Background="{DynamicResource PreviewBrush}" CornerRadius="7" BoxShadow="0 20 42 0 #77000000" Padding="8">
+                  <Grid>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasProject}" Spacing="10">
+                      <TextBlock Text="No recording open" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                      <TextBlock Text="Choose a recording, or start a new one." Classes="muted" HorizontalAlignment="Center" />
+                      <Button Content="New recording" Classes="accent" Click="RecordingClick" HorizontalAlignment="Center" AutomationProperties.Name="New recording from empty workspace" />
+                    </StackPanel>
+                    <Image x:Name="EvidencePreview" Source="{Binding Preview}" Stretch="Uniform" IsVisible="{Binding HasProject}" AutomationProperties.Name="Recorded screen preview" />
+                  </Grid>
+                </Border>
+                <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" CornerRadius="7" Padding="12,9">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding Selected.Title}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Result}" Classes="muted" FontSize="12" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Edit description" Click="InspectorToggleClick" Classes="subtle" IsEnabled="{Binding CanEdit}" />
+                  </Grid>
+                </Border>
+              </Grid>
+              <GridSplitter x:Name="InspectorSplitter" Grid.Column="1" Background="Transparent" ResizeDirection="Columns" AutomationProperties.Name="Resize moment details panel" />
+              <Border x:Name="DescriptionInspector" Grid.Column="2" Background="{DynamicResource SurfaceBrush}" Padding="20,17,20,16">
+                <Grid RowDefinitions="Auto,*,Auto">
+                  <StackPanel Spacing="4" Margin="0,0,0,12">
+                    <TextBlock Text="Moment details" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="Describe only what the screen shows." Classes="muted" FontSize="12" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <ScrollViewer Grid.Row="1">
+                    <StackPanel Spacing="8" IsEnabled="{Binding CanEdit}">
+                      <TextBlock Text="Moment title" Classes="field-label" FontSize="12" />
+                      <TextBox Text="{Binding Title, Mode=TwoWay}" AutomationProperties.Name="Moment title" />
+                      <TextBlock Text="Action" Classes="field-label" FontSize="12" Margin="0,7,0,0" />
+                      <TextBox Text="{Binding Action, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="82" AutomationProperties.Name="Action description" />
+                      <TextBlock Text="Visible result" Classes="field-label" FontSize="12" Margin="0,7,0,0" />
+                      <TextBox Text="{Binding Result, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="82" AutomationProperties.Name="Visible result description" />
+                      <TextBlock Text="Uncertainty or notes" Classes="field-label" FontSize="12" Margin="0,7,0,0" />
+                      <TextBox Text="{Binding Uncertainty, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="62" AutomationProperties.Name="Uncertainty or review notes" />
+                    </StackPanel>
+                  </ScrollViewer>
+                  <StackPanel Grid.Row="2" Spacing="8" Margin="0,12,0,0">
+                    <WrapPanel IsEnabled="{Binding CanEdit}">
+                      <Button Content="Generate pending" Click="GenerateClick" Margin="0,0,6,6" />
+                      <Button Content="Regenerate…" Click="RegenerateClick" Margin="0,0,0,6" />
+                    </WrapPanel>
+                    <Button Content="✓ Mark reviewed" Click="ReviewClick" IsEnabled="{Binding CanEdit}" HorizontalAlignment="Stretch" />
+                    <TextBlock Text="Manual edits stay yours." Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </Grid>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" />
+            <Border x:Name="PromptPanel" Grid.Column="2" Background="{DynamicResource SurfaceBrush}" Padding="20,18,20,12">
+              <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Text="Your prompt" FontSize="20" FontWeight="SemiBold" />
+                  <Button Grid.Column="1" Content="Format" Classes="subtle" Click="SettingsClick" />
+                </Grid>
+                <StackPanel Grid.Row="1" Spacing="5">
+                  <TextBlock Text="Task — your requested outcome" Classes="muted" FontSize="11" />
+                  <TextBox x:Name="TaskInput" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="76" LostFocus="TaskLostFocus" AutomationProperties.Name="User intended task" PlaceholderText="What should the AI help you do?" IsEnabled="{Binding CanCurate}" />
+                </StackPanel>
+                <Expander Grid.Row="2" Header="User context">
+                  <TextBlock x:Name="PromptContext" TextWrapping="Wrap" Classes="muted" />
+                </Expander>
+                <TextBox Grid.Row="3" x:Name="PromptText" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" AutomationProperties.Name="Generated prompt" />
+                <WrapPanel Grid.Row="4">
+                  <Button x:Name="CopyPromptButton" Content="Copy prompt" Click="CopyPromptClick" IsEnabled="{Binding CanCurate}" Margin="0,0,8,4" />
+                  <Button x:Name="ContinueReviewButton" Content="Continue reviewing" Classes="subtle" Click="ContinueReviewClick" IsVisible="False" />
+                </WrapPanel>
+              </Grid>
+            </Border>
+          </Grid>
+          <Grid Grid.Row="1" RowDefinitions="Auto,Auto" Margin="24,0,24,20" RowSpacing="10">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
+              <StackPanel Orientation="Horizontal" Spacing="5">
+                <Button Content="|◁" Classes="subtle" Click="PreviousClick" AutomationProperties.Name="Previous frame" ToolTip.Tip="Previous source frame" />
+                <Button x:Name="PlayButton" Content="Play" Classes="accent" Click="PlayClick" AutomationProperties.Name="Play or pause recording" HorizontalContentAlignment="Center" MinWidth="68" />
+                <Button Content="▷|" Classes="subtle" Click="NextClick" AutomationProperties.Name="Next frame" ToolTip.Tip="Next source frame" />
+              </StackPanel>
+              <Slider Grid.Column="1" Minimum="0" Maximum="{Binding MaximumFrame}" Value="{Binding FrameIndex, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" AutomationProperties.Name="Source frame timeline" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="2" Text="{Binding TimeLabel}" Classes="timecode" VerticalAlignment="Center" />
+            </Grid>
+            <Grid Grid.Row="1" RowDefinitions="Auto,*" Height="92">
+              <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="{Binding MomentCount}" Classes="muted" FontSize="11" VerticalAlignment="Center" />
+                  <Button Content="Generate descriptions" Click="GenerateClick" IsEnabled="{Binding CanCurate}" Classes="subtle" />
+                  <Button x:Name="GetPromptButton" Content="Get prompt" Classes="accent" Click="GetPromptClick" IsEnabled="{Binding CanCurate}" Margin="0,0,8,4" />
+                </StackPanel>
+              </Grid>
+              <ListBox Grid.Row="1" x:Name="MomentList" ItemsSource="{Binding Moments}" SelectedItem="{Binding Selected, Mode=OneWay}" SelectionChanged="MomentChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="Selected moments">
+                <ListBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.Styles>
+                  <Style Selector="ListBoxItem">
+                    <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}" />
+                  </Style>
+                  <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource TideSubtleBrush}" />
+                  </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Width="204" ColumnDefinitions="80,*" RowDefinitions="Auto,Auto,Auto" Margin="3,3">
+                      <local:MomentThumbnail Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="8,0,2,0">
+                        <TextBlock Text="{Binding Number}" Classes="muted" FontSize="11" />
+                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" MaxWidth="100" FontWeight="Medium" FontSize="12" />
+                      </StackPanel>
+                      <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Time}" Classes="muted" FontSize="11" Margin="8,0,2,0" />
+                      <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding StatusLabel}" Classes="muted" TextWrapping="Wrap" MaxHeight="27" FontSize="11" Margin="8,0,2,0" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Grid>
+          </Grid>
+        </Grid>
+        <ContentControl x:Name="SettingsPage" IsVisible="False" />
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

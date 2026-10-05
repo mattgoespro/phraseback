@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Phraseback.Tests" />
+    <EmbeddedResource Include="../../fixtures/studio/*.json;../../fixtures/studio/*.jsonl" LogicalName="studio/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../fixtures/studio/frames/*.png" LogicalName="studio/frames/%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

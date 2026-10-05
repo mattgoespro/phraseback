@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><IsTestProject>true</IsTestProject><IsPackable>false</IsPackable><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Phraseback.App/Phraseback.App.csproj" />
+    <ProjectReference Include="../../tools/Phraseback.Tools/Phraseback.Tools.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5"><PrivateAssets>all</PrivateAssets></PackageReference>
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.2" />
+    <None Include="../../contracts/*.json" Link="contracts/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../crates/flow-engine/src/main.rs" Link="generator-baseline/app/crates/flow-engine/src/main.rs" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../crates/flow-core/src/*_generated.rs" Link="generator-baseline/app/crates/flow-core/src/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../Phraseback.Client/*.Generated.cs" Link="generator-baseline/app/shell/Phraseback.Client/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,118 @@
+[
+  {
+    "id": "qwen2-cpu",
+    "title": "Qwen3-VL 2B · CPU (existing default)",
+    "model_id": "qwen2",
+    "revision": "ea6a11058182570be6436b9a2e4ee7f7b49f908d",
+    "gpu": false,
+    "ram_gb": 8,
+    "suggested_vram_gb": 0,
+    "assets": [
+      {
+        "name": "Qwen3-VL-2B-Instruct-Q8_0.gguf",
+        "size": 1834427296,
+        "sha256": "b7802e29f71a9e5b5e3f83f613df898a2204342dcea71a231ea501d481813c39",
+        "url": "https://huggingface.co/ggml-org/Qwen3-VL-2B-Instruct-GGUF/resolve/ea6a11058182570be6436b9a2e4ee7f7b49f908d/Qwen3-VL-2B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "mmproj-Qwen3-VL-2B-Instruct-Q8_0.gguf",
+        "size": 445053056,
+        "sha256": "69066c8f279ec85ff48ab4059f6ebba0d2932ca57667f2bbdac7d9805bca9e7b",
+        "url": "https://huggingface.co/ggml-org/Qwen3-VL-2B-Instruct-GGUF/resolve/ea6a11058182570be6436b9a2e4ee7f7b49f908d/mmproj-Qwen3-VL-2B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "runtime.zip",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10985/llama-b10985-bin-win-cpu-x64.zip",
+        "size": 18428919,
+        "sha256": "119395dbc719c0d55008acd11450b6750b3409a436eeeb7b2e5aa39a9a429156"
+      }
+    ]
+  },
+  {
+    "id": "qwen2-gpu",
+    "title": "Qwen3-VL 2B · GPU · Lightweight",
+    "model_id": "qwen2",
+    "revision": "ea6a11058182570be6436b9a2e4ee7f7b49f908d",
+    "gpu": true,
+    "ram_gb": 8,
+    "suggested_vram_gb": 6,
+    "assets": [
+      {
+        "name": "Qwen3-VL-2B-Instruct-Q8_0.gguf",
+        "size": 1834427296,
+        "sha256": "b7802e29f71a9e5b5e3f83f613df898a2204342dcea71a231ea501d481813c39",
+        "url": "https://huggingface.co/ggml-org/Qwen3-VL-2B-Instruct-GGUF/resolve/ea6a11058182570be6436b9a2e4ee7f7b49f908d/Qwen3-VL-2B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "mmproj-Qwen3-VL-2B-Instruct-Q8_0.gguf",
+        "size": 445053056,
+        "sha256": "69066c8f279ec85ff48ab4059f6ebba0d2932ca57667f2bbdac7d9805bca9e7b",
+        "url": "https://huggingface.co/ggml-org/Qwen3-VL-2B-Instruct-GGUF/resolve/ea6a11058182570be6436b9a2e4ee7f7b49f908d/mmproj-Qwen3-VL-2B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "runtime-vulkan.zip",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10985/llama-b10985-bin-win-vulkan-x64.zip",
+        "size": 31690999,
+        "sha256": "749b86053a0b8fd280cac6603b5e4e6025474cf5790884fc23be912080ac11f0"
+      }
+    ]
+  },
+  {
+    "id": "qwen4-gpu",
+    "title": "Qwen3-VL 4B · GPU · Balanced",
+    "model_id": "qwen4",
+    "revision": "1cd86afb9a95c410a6038ab3b40d8b578c892266",
+    "gpu": true,
+    "ram_gb": 16,
+    "suggested_vram_gb": 8,
+    "assets": [
+      {
+        "name": "Qwen3VL-4B-Instruct-Q4_K_M.gguf",
+        "size": 2497281664,
+        "sha256": "66358cb18bb6b3b1b6675aa412c7a88ef01d228f481184d13668e5201c730a0a",
+        "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct-GGUF/resolve/1cd86afb9a95c410a6038ab3b40d8b578c892266/Qwen3VL-4B-Instruct-Q4_K_M.gguf"
+      },
+      {
+        "name": "mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf",
+        "size": 453974304,
+        "sha256": "30ba2c7dd3127a4561b6cba9d13d0f711c91bdb38742e2f56d73c8cb596bd06d",
+        "url": "https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct-GGUF/resolve/1cd86afb9a95c410a6038ab3b40d8b578c892266/mmproj-Qwen3VL-4B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "runtime-vulkan.zip",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10985/llama-b10985-bin-win-vulkan-x64.zip",
+        "size": 31690999,
+        "sha256": "749b86053a0b8fd280cac6603b5e4e6025474cf5790884fc23be912080ac11f0"
+      }
+    ]
+  },
+  {
+    "id": "qwen8-gpu",
+    "title": "Qwen3-VL 8B · GPU · Larger model",
+    "model_id": "qwen8",
+    "revision": "f982a07559d4a2f6c8744d840bf6fccab30eea96",
+    "gpu": true,
+    "ram_gb": 16,
+    "suggested_vram_gb": 12,
+    "assets": [
+      {
+        "name": "Qwen3VL-8B-Instruct-Q4_K_M.gguf",
+        "size": 5027784800,
+        "sha256": "67d1659bfe71b89d50b45a4ad1a9e5b997e5bb16ce5da66a6a6167abd569e9e2",
+        "url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/f982a07559d4a2f6c8744d840bf6fccab30eea96/Qwen3VL-8B-Instruct-Q4_K_M.gguf"
+      },
+      {
+        "name": "mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf",
+        "size": 752289728,
+        "sha256": "c6ba85508d82f42590e6eb77d5340369ab6fecf107a7561d809523d8aa5f3bfd",
+        "url": "https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/f982a07559d4a2f6c8744d840bf6fccab30eea96/mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf"
+      },
+      {
+        "name": "runtime-vulkan.zip",
+        "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10985/llama-b10985-bin-win-vulkan-x64.zip",
+        "size": 31690999,
+        "sha256": "749b86053a0b8fd280cac6603b5e4e6025474cf5790884fc23be912080ac11f0"
+      }
+    ]
+  }
+]

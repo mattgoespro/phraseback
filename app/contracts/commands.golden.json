@@ -1,0 +1,781 @@
+{
+  "valid": [
+    {
+      "method": "prepare_open",
+      "request": {
+        "recording_id": "sample"
+      },
+      "response": {
+        "id": "golden",
+        "kind": "opening",
+        "state": "opening",
+        "progress": 0,
+        "message": "Opening recording",
+        "recording_id": "sample",
+        "revision": 1,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "ui_preferences",
+      "request": {},
+      "response": {
+        "width": 1280,
+        "height": 800,
+        "maximized": false
+      }
+    },
+    {
+      "method": "save_ui_preferences",
+      "request": {
+        "width": 1400,
+        "height": 900,
+        "maximized": true,
+        "theme": "dark"
+      },
+      "response": {
+        "width": 1400,
+        "height": 900,
+        "maximized": true,
+        "theme": "dark"
+      }
+    },
+    {
+      "method": "library_page",
+      "request": {},
+      "response": {
+        "items": [],
+        "catalog_id": "golden",
+        "next_offset": null,
+        "indexing": true
+      }
+    },
+    {
+      "method": "organize_background",
+      "request": {
+        "recording_id": "sample",
+        "revision": 1
+      },
+      "response": {
+        "id": "golden",
+        "kind": "organizing",
+        "state": "completed",
+        "progress": 100,
+        "message": "Complete",
+        "recording_id": "sample",
+        "revision": 1,
+        "finished": true,
+        "error": null,
+        "result": {}
+      }
+    },
+    {
+      "method": "organization_status",
+      "request": {},
+      "response": null
+    },
+    {
+      "method": "cancel_organization",
+      "request": {
+        "id": "golden"
+      },
+      "response": {
+        "cancelling": true
+      }
+    },
+    {
+      "method": "apply_organization",
+      "request": {
+        "id": "golden",
+        "recording_id": "sample",
+        "revision": 1
+      },
+      "response": {
+        "recording_id": "sample",
+        "revision": 2,
+        "project": {
+          "version": 1,
+          "title": "Example",
+          "context": "",
+          "created": "",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "",
+          "state": "ready"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "hello",
+      "request": {
+        "notifications": false
+      },
+      "response": {
+        "engine_version": "golden",
+        "protocol_minor": 0,
+        "notifications": false
+      }
+    },
+    {
+      "method": "capabilities",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "prototype": false,
+        "shared_data": false,
+        "capture": false,
+        "generation": false,
+        "export": false,
+        "editing": false,
+        "source_enumeration": false,
+        "system_selection": false,
+        "region_cropping": false,
+        "cursor_modes": [],
+        "control_exclusion": false
+      }
+    },
+    {
+      "method": "screens",
+      "request": {
+        "revision": 0
+      },
+      "response": []
+    },
+    {
+      "method": "list_projects",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "items": []
+      }
+    },
+    {
+      "method": "open_project",
+      "request": {
+        "recording_id": "golden",
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "metadata_page",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "kind": "frames",
+        "offset": 0,
+        "limit": 128
+      },
+      "response": {
+        "items": [],
+        "revision": 0,
+        "next_offset": null
+      }
+    },
+    {
+      "method": "frame",
+      "request": {
+        "recording_id": "golden",
+        "index": 0,
+        "preview_width": null
+      },
+      "response": {
+        "path": "golden",
+        "recording_id": "golden",
+        "index": 0,
+        "revision": 0
+      }
+    },
+    {
+      "method": "edit_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "golden",
+        "title": "golden",
+        "action": "golden",
+        "result": "golden",
+        "uncertainty": "golden",
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "review_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "golden",
+        "reviewed": false,
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "add_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "frame": 0,
+        "step_id": null,
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "remove_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "golden",
+        "frame": null,
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "replace_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "golden",
+        "frame": 0,
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "edit_project",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "title": "golden",
+        "context": "golden",
+        "paged": false
+      },
+      "response": {
+        "recording_id": "golden",
+        "revision": 0,
+        "project": {
+          "version": 0,
+          "title": "golden",
+          "context": "golden",
+          "created": "golden",
+          "frames": [],
+          "steps": [],
+          "duration_ms": 0,
+          "width": 0,
+          "height": 0,
+          "error": "golden",
+          "state": "golden"
+        },
+        "frame_count": 0,
+        "step_count": 0
+      }
+    },
+    {
+      "method": "organize",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "alternatives",
+      "request": {
+        "recording_id": "golden"
+      },
+      "response": {
+        "selected": [],
+        "intervals": []
+      }
+    },
+    {
+      "method": "prepare_capture",
+      "request": {
+        "screen": {
+          "id": "golden",
+          "name": "golden",
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0
+        },
+        "area": {
+          "left": 0,
+          "top": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": "golden",
+        "context": "golden"
+      },
+      "response": {
+        "token": "golden"
+      }
+    },
+    {
+      "method": "start_capture",
+      "request": {
+        "token": "golden",
+        "exclusion_ready": false,
+        "shortcut_ready": false
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "operation_status",
+      "request": {
+        "revision": 0
+      },
+      "response": null
+    },
+    {
+      "method": "cancel_operation",
+      "request": {
+        "id": "golden"
+      },
+      "response": {
+        "cancelling": false
+      }
+    },
+    {
+      "method": "model_status",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "presets": [],
+        "selected": "golden",
+        "state": "golden",
+        "assets_present": false,
+        "verified": false
+      }
+    },
+    {
+      "method": "model_select",
+      "request": {
+        "preset": "golden"
+      },
+      "response": {
+        "presets": [],
+        "selected": "golden",
+        "state": "golden",
+        "assets_present": false,
+        "verified": false
+      }
+    },
+    {
+      "method": "model_release",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "presets": [],
+        "selected": "golden",
+        "state": "golden",
+        "assets_present": false,
+        "verified": false
+      }
+    },
+    {
+      "method": "model_install",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "model_verify",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "model_remove",
+      "request": {
+        "confirmed": false,
+        "revision": 0
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "generate",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": null,
+        "force": false,
+        "replace_manual": false
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "export",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "parent": "golden"
+      },
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "shutdown",
+      "request": {
+        "revision": 0
+      },
+      "response": {
+        "stopped": false
+      }
+    },
+    {
+      "method": "metadata_page",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "kind": "steps",
+        "offset": 0
+      },
+      "response": {
+        "items": [],
+        "revision": 0,
+        "next_offset": null
+      }
+    },
+    {
+      "method": "operation_status",
+      "request": {},
+      "response": {
+        "id": "golden",
+        "kind": "golden",
+        "state": "golden",
+        "progress": 0,
+        "message": "golden",
+        "recording_id": null,
+        "revision": 0,
+        "finished": false,
+        "error": null,
+        "result": null
+      }
+    },
+    {
+      "method": "prompt_template",
+      "request": {},
+      "response": {
+        "template": "{{title}}",
+        "default_template": "{{title}}"
+      }
+    },
+    {
+      "method": "save_prompt_template",
+      "request": {
+        "template": "{{task}}"
+      },
+      "response": {
+        "template": "{{task}}",
+        "default_template": "{{title}}"
+      }
+    },
+    {
+      "method": "reset_prompt_template",
+      "request": {},
+      "response": {
+        "template": "{{title}}",
+        "default_template": "{{title}}"
+      }
+    },
+    {
+      "method": "render_prompt",
+      "request": {
+        "recording_id": "sample",
+        "revision": 1
+      },
+      "response": {
+        "recording_id": "sample",
+        "revision": 1,
+        "markdown": "Example"
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "method": "hello",
+      "request": {
+        "notifications": "true"
+      }
+    },
+    {
+      "method": "edit_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "step",
+        "title": "Title",
+        "action": null,
+        "result": "",
+        "uncertainty": ""
+      }
+    },
+    {
+      "method": "edit_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "step_id": "step",
+        "title": "Title",
+        "action": "",
+        "result": ""
+      }
+    },
+    {
+      "method": "model_remove",
+      "request": {
+        "confirmed": 1
+      }
+    },
+    {
+      "method": "review_step",
+      "request": {
+        "recording_id": "golden",
+        "revision": -1,
+        "step_id": "golden",
+        "reviewed": false
+      }
+    },
+    {
+      "method": "frame",
+      "request": {
+        "recording_id": "golden",
+        "index": 0.5
+      }
+    },
+    {
+      "method": "generate",
+      "request": {
+        "recording_id": "golden",
+        "revision": 0,
+        "replace_manual": "false"
+      }
+    },
+    {
+      "method": "open_project",
+      "request": {
+        "recording_id": "golden",
+        "paged": null
+      }
+    },
+    {
+      "method": "start_capture",
+      "request": {
+        "token": "golden",
+        "exclusion_ready": true
+      }
+    },
+    {
+      "method": "shutdown",
+      "request": {
+        "typo": true
+      }
+    },
+    {
+      "method": "unknown",
+      "request": {}
+    }
+  ]
+}

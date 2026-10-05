@@ -1,0 +1,155 @@
+name: Replacement verification
+on:
+  push:
+    paths: ['app/**', 'scripts/**', '.cargo/**', 'build.ps1', 'global.json', '.gitattributes', '.github/workflows/rebuild.yml']
+  pull_request:
+    paths: ['app/**', 'scripts/**', '.cargo/**', 'build.ps1', 'global.json', '.gitattributes', '.github/workflows/rebuild.yml']
+  workflow_dispatch:
+    inputs:
+      run_portable:
+        description: 'Also run optional Linux/macOS shared-component checks'
+        type: boolean
+        default: false
+      run_endurance:
+        description: 'Run CPU recording, encoder heap and real-decoder review checks (no desktop capture)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  portable-contracts:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.run_portable && '["windows-latest","ubuntu-latest","macos-latest"]' || '["windows-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/.tmp/rebuild/target
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      FLOW_REBUILD_TEST_ROOT: ${{ github.workspace }}/.tmp/rebuild/csharp-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+          cache: true
+          cache-dependency-path: 'app/**/packages.lock.json'
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal --component rustfmt --component clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tmp/rebuild/target
+          key: ${{ runner.os }}-rust-1.98.1-${{ hashFiles('app/Cargo.lock', '.cargo/config.toml') }}
+      - name: Check shared definitions
+        run: dotnet run --project app/tools/Phraseback.Tools/Phraseback.Tools.csproj -p:RestoreLockedMode=true
+      - name: Rust checks
+        working-directory: app
+        run: |
+          cargo fmt --all --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked
+          cargo build --locked
+      - name: Select test engine
+        shell: pwsh
+        run: |
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          "FLOW_REBUILD_ENGINE=$env:CARGO_TARGET_DIR/debug/phraseback-engine$suffix" >> $env:GITHUB_ENV
+      - name: C# client and headless UI checks
+        run: dotnet test app/shell/Phraseback.Tests/Phraseback.Tests.csproj -p:RestoreLockedMode=true --logger trx --results-directory .tmp/rebuild/reports
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prototype-reports-${{ runner.os }}
+          path: .tmp/rebuild/reports
+          if-no-files-found: ignore
+
+  windows-package:
+    needs: [portable-contracts]
+    runs-on: windows-latest
+    timeout-minutes: 35
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.401'
+          cache: true
+          cache-dependency-path: 'app/**/packages.lock.json'
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.98.1 --profile minimal
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tmp/rebuild/target
+          key: windows-package-rust-1.98.1-${{ hashFiles('app/Cargo.lock', '.cargo/config.toml') }}
+      - name: Install verified Inno compiler on disposable runner
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $pin = Get-Content app/packaging/inno.lock.json -Raw | ConvertFrom-Json
+          $toolRoot = Join-Path $env:GITHUB_WORKSPACE '.tmp/tooling'
+          New-Item -ItemType Directory -Force $toolRoot | Out-Null
+          $setup = Join-Path $toolRoot 'inno-setup.exe'
+          Invoke-WebRequest -Uri $pin.installer_url -OutFile $setup
+          if ((Get-FileHash $setup -Algorithm SHA256).Hash -ne $pin.installer_sha256) { throw 'Inno installer hash mismatch' }
+          $signature = Get-AuthenticodeSignature $setup
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notlike "*O=$($pin.publisher),*") { throw 'Inno publisher verification failed' }
+          $destination = Join-Path $toolRoot "inno-$($pin.version)"
+          $process = Start-Process -FilePath $setup -ArgumentList @('/CURRENTUSER','/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-','/NOICONS',('/DIR="' + $destination + '"')) -WindowStyle Hidden -PassThru
+          if (-not $process.WaitForExit(60000)) { $process.Kill($true); throw 'Inno setup timed out' }
+          if ($process.ExitCode -ne 0) { throw "Inno setup failed: $($process.ExitCode)" }
+      - uses: actions/cache@v4
+        with:
+          path: .tmp/rebuild/dependencies/ffmpeg-minimal
+          key: windows-minimal-encoder-${{ hashFiles('app/packaging/ffmpeg.lock.json', 'app/packaging/ffmpeg-source.lock.json', 'scripts/build_minimal_ffmpeg.sh') }}
+      - name: Build self-contained portable folder and per-user installer
+        run: ./scripts/rebuild_package.ps1
+      - name: Verify release startup and handshake-before-write policy
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/.tmp/rebuild/target
+        run: cargo +1.98.1-x86_64-pc-windows-msvc test --manifest-path app/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine --test startup
+      - name: Verify dependency acquisition and license inventory
+        run: |
+          ./scripts/test_rebuild_ffmpeg.ps1
+          $candidate = Get-Content .tmp/rebuild/playground-payload.json -Raw | ConvertFrom-Json
+          ./scripts/test_rebuild_notices.ps1 -Payload $candidate.payload
+      - name: Optional synthetic recording endurance
+        if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
+        run: ./scripts/rebuild_endurance_check.ps1
+      - name: Optional real-decoder review endurance
+        if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
+        run: ./scripts/rebuild_review_endurance.ps1
+      - name: Optional encoder heap accounting
+        if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
+        run: ./scripts/rebuild_encoder_memory.ps1
+      # Do not publish executable artifacts while redistribution/source gates are open.
+      # Hosted build success is not native desktop or clean-machine acceptance.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-package-provenance
+          path: |
+            .tmp/rebuild/package-*/build-provenance.json
+            .tmp/rebuild/package-*/cargo-metadata.json
+            .tmp/rebuild/package-*/inno.lock.json
+            .tmp/rebuild/package-*/package-summary.json
+            .tmp/rebuild/package-*/runtime-imports.json
+            .tmp/rebuild/package-*/Phraseback/licenses/components.json
+            .tmp/rebuild/package-*/Phraseback/licenses/status.json
+            .tmp/rebuild/endurance-*/*.json
+            .tmp/rebuild/endurance-*/*.log
+            .tmp/rebuild/review-endurance-*/*.json
+            .tmp/rebuild/review-endurance-*/*.trx
+            .tmp/rebuild/encoder-memory-*/*.json
+          if-no-files-found: warn

@@ -1,0 +1,4 @@
+# These golden assets are hashed byte-for-byte, including metadata line endings.
+project.json -text
+frames.jsonl -text
+frames/*.png binary

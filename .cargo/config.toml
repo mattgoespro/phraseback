@@ -1,0 +1,4 @@
+# The portable Windows build must not require a separately installed VC runtime.
+# Target-specific flags leave Linux/macOS and the development GNU toolchain alone.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]

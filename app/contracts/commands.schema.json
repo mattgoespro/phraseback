@@ -1,0 +1,1969 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow-recorder.local/contracts/commands-v1",
+  "title": "Phraseback command payloads",
+  "description": "Internal operation result objects are worker-specific; the operation identity and state are shared. Optional compatibility fields preserve existing v1 callers.",
+  "$defs": {
+    "UiPreferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "maximized"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u32",
+          "x-csharp": "uint"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u32",
+          "x-csharp": "uint"
+        },
+        "maximized": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "theme": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        }
+      }
+    },
+    "ApplyOrganizationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "id"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "LibraryPageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong",
+          "default": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong",
+          "default": 64
+        },
+        "catalog_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "x-rust": "String",
+              "x-csharp": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        },
+        "refresh": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "LibraryPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "catalog_id",
+        "next_offset",
+        "indexing"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LibraryEntry"
+          },
+          "x-rust": "Vec<LibraryEntry>",
+          "x-csharp": "LibraryEntry[]"
+        },
+        "catalog_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "next_offset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "x-rust": "i32",
+              "x-csharp": "int"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<i32>",
+          "x-csharp": "int?"
+        },
+        "indexing": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "EmptyRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong",
+          "default": 0
+        }
+      }
+    },
+    "HelloRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "notifications": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "HelloResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine_version",
+        "protocol_minor"
+      ],
+      "properties": {
+        "engine_version": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "protocol_minor": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "notifications": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "Capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prototype",
+        "shared_data",
+        "capture",
+        "generation",
+        "export",
+        "editing",
+        "source_enumeration",
+        "system_selection",
+        "region_cropping",
+        "cursor_modes",
+        "control_exclusion"
+      ],
+      "properties": {
+        "prototype": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "shared_data": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "capture": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "generation": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "export": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "editing": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "source_enumeration": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "system_selection": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "region_cropping": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "cursor_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "x-rust": "String",
+            "x-csharp": "string"
+          },
+          "x-rust": "Vec<String>",
+          "x-csharp": "string[]"
+        },
+        "control_exclusion": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "Frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "time_ms"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "time_ms": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        }
+      }
+    },
+    "Step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frame",
+        "id",
+        "title",
+        "action",
+        "result",
+        "status",
+        "manual",
+        "reviewed",
+        "uncertainty"
+      ],
+      "properties": {
+        "frame": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "action": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "result": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "status": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "manual": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "reviewed": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "uncertainty": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "Project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "title",
+        "context",
+        "created",
+        "frames",
+        "steps",
+        "duration_ms",
+        "width",
+        "height",
+        "error",
+        "state"
+      ],
+      "properties": {
+        "version": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "context": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "created": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "frames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Frame",
+            "x-rust": "Frame",
+            "x-csharp": "Frame"
+          },
+          "x-rust": "Vec<Frame>",
+          "x-csharp": "Frame[]"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step",
+            "x-rust": "Step",
+            "x-csharp": "Step"
+          },
+          "x-rust": "Vec<Step>",
+          "x-csharp": "Step[]"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "error": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "state": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "task": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string",
+          "default": ""
+        }
+      }
+    },
+    "Snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "project"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "project": {
+          "$ref": "#/$defs/Project",
+          "x-rust": "Project",
+          "x-csharp": "Project"
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int",
+          "default": 0
+        },
+        "step_count": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int",
+          "default": 0
+        }
+      }
+    },
+    "FramePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "revision",
+        "next_offset"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Frame",
+            "x-rust": "Frame",
+            "x-csharp": "Frame"
+          },
+          "x-rust": "Vec<Frame>",
+          "x-csharp": "Frame[]"
+        },
+        "revision": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "next_offset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647,
+              "x-rust": "i32",
+              "x-csharp": "int"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<i32>",
+          "x-csharp": "int?"
+        }
+      }
+    },
+    "StepPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items",
+        "revision",
+        "next_offset"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Step",
+            "x-rust": "Step",
+            "x-csharp": "Step"
+          },
+          "x-rust": "Vec<Step>",
+          "x-csharp": "Step[]"
+        },
+        "revision": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "next_offset": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647,
+              "x-rust": "i32",
+              "x-csharp": "int"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<i32>",
+          "x-csharp": "int?"
+        }
+      }
+    },
+    "LibraryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "created",
+        "duration_ms",
+        "steps"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "created": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "steps": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        }
+      }
+    },
+    "Library": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LibraryEntry",
+            "x-rust": "LibraryEntry",
+            "x-csharp": "LibraryEntry"
+          },
+          "x-rust": "Vec<LibraryEntry>",
+          "x-csharp": "LibraryEntry[]"
+        }
+      }
+    },
+    "ImageReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "recording_id",
+        "index",
+        "revision"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "revision": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        }
+      }
+    },
+    "CaptureScreen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "left",
+        "top",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "name": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "left": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "top": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        }
+      }
+    },
+    "CaptureArea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "left",
+        "top",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "left": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "top": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        }
+      }
+    },
+    "CapturePreparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token"
+      ],
+      "properties": {
+        "token": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "OperationStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "progress",
+        "message",
+        "recording_id",
+        "revision",
+        "finished",
+        "error",
+        "result"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "kind": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "state": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "progress": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "message": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "recording_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "x-rust": "String",
+              "x-csharp": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?"
+        },
+        "revision": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "finished": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string",
+              "x-rust": "String",
+              "x-csharp": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "x-rust": "Value",
+              "x-csharp": "JsonElement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<Value>",
+          "x-csharp": "JsonElement?"
+        }
+      }
+    },
+    "Suggestions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selected",
+        "intervals"
+      ],
+      "properties": {
+        "selected": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -2147483648,
+            "maximum": 2147483647,
+            "x-rust": "i32",
+            "x-csharp": "int"
+          },
+          "x-rust": "Vec<i32>",
+          "x-csharp": "int[]"
+        },
+        "intervals": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": -2147483648,
+              "maximum": 2147483647,
+              "x-rust": "i32",
+              "x-csharp": "int"
+            },
+            "x-rust": "Vec<i32>",
+            "x-csharp": "int[]"
+          },
+          "x-rust": "Vec<Vec<i32>>",
+          "x-csharp": "int[][]"
+        }
+      }
+    },
+    "ModelAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url",
+        "size",
+        "sha256"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "url": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "size": {
+          "type": "integer",
+          "x-rust": "i64",
+          "x-csharp": "long"
+        },
+        "sha256": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "ModelPreset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "model_id",
+        "revision",
+        "gpu",
+        "ram_gb",
+        "suggested_vram_gb",
+        "assets"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "model_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "gpu": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "ram_gb": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "suggested_vram_gb": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647,
+          "x-rust": "i32",
+          "x-csharp": "int"
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ModelAsset",
+            "x-rust": "ModelAsset",
+            "x-csharp": "ModelAsset"
+          },
+          "x-rust": "Vec<ModelAsset>",
+          "x-csharp": "ModelAsset[]"
+        }
+      }
+    },
+    "ModelStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presets",
+        "selected",
+        "state",
+        "assets_present",
+        "verified"
+      ],
+      "properties": {
+        "presets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ModelPreset",
+            "x-rust": "ModelPreset",
+            "x-csharp": "ModelPreset"
+          },
+          "x-rust": "Vec<ModelPreset>",
+          "x-csharp": "ModelPreset[]"
+        },
+        "selected": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "state": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "assets_present": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "verified": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "Cancelled": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cancelling"
+      ],
+      "properties": {
+        "cancelling": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "ShutdownResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stopped"
+      ],
+      "properties": {
+        "stopped": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "OpenProjectRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "MetadataPageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "kind",
+        "offset"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "kind": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong",
+          "default": 128
+        }
+      }
+    },
+    "FrameRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "index"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "preview_width": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "x-rust": "u64",
+              "x-csharp": "ulong"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<u64>",
+          "x-csharp": "ulong?",
+          "default": null
+        }
+      }
+    },
+    "EditStepRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "step_id",
+        "title",
+        "action",
+        "result",
+        "uncertainty"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "action": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "result": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "uncertainty": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "ReviewStepRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "step_id",
+        "reviewed"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "reviewed": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "AddStepRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "frame"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "x-rust": "String",
+              "x-csharp": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "RemoveStepRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "step_id"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "frame": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "x-rust": "u64",
+              "x-csharp": "ulong"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<u64>",
+          "x-csharp": "ulong?",
+          "default": null
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "ReplaceStepRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "step_id",
+        "frame"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "EditProjectRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "title",
+        "context"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "context": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "paged": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        },
+        "task": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        }
+      }
+    },
+    "ProjectOperationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        }
+      }
+    },
+    "AlternativesRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "PrepareCaptureRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "screen",
+        "area",
+        "title",
+        "context"
+      ],
+      "properties": {
+        "screen": {
+          "$ref": "#/$defs/CaptureScreen",
+          "x-rust": "CaptureScreen",
+          "x-csharp": "CaptureScreen"
+        },
+        "area": {
+          "$ref": "#/$defs/CaptureArea",
+          "x-rust": "CaptureArea",
+          "x-csharp": "CaptureArea"
+        },
+        "title": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "context": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "StartCaptureRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token",
+        "exclusion_ready",
+        "shortcut_ready"
+      ],
+      "properties": {
+        "token": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "exclusion_ready": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "shortcut_ready": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        }
+      }
+    },
+    "CancelOperationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "ModelSelectRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preset"
+      ],
+      "properties": {
+        "preset": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "ModelRemoveRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "confirmed"
+      ],
+      "properties": {
+        "confirmed": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong",
+          "default": 0
+        }
+      }
+    },
+    "GenerateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "x-rust": "String",
+              "x-csharp": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        },
+        "force": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        },
+        "replace_manual": {
+          "type": "boolean",
+          "x-rust": "bool",
+          "x-csharp": "bool",
+          "default": false
+        }
+      }
+    },
+    "ExportRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "parent"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "parent": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "PromptTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template",
+        "default_template"
+      ],
+      "properties": {
+        "template": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "default_template": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "SavePromptTemplateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template"
+      ],
+      "properties": {
+        "template": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    },
+    "RenderPromptRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "template": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "x-rust": "Option<String>",
+          "x-csharp": "string?",
+          "default": null
+        }
+      }
+    },
+    "RenderedPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "revision",
+        "markdown"
+      ],
+      "properties": {
+        "recording_id": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "x-rust": "u64",
+          "x-csharp": "ulong"
+        },
+        "markdown": {
+          "type": "string",
+          "x-rust": "String",
+          "x-csharp": "string"
+        }
+      }
+    }
+  },
+  "x-methods": {
+    "prepare_open": {
+      "request": "OpenProjectRequest",
+      "response": "OperationStatus"
+    },
+    "library_page": {
+      "request": "LibraryPageRequest",
+      "response": "LibraryPage"
+    },
+    "organize_background": {
+      "request": "ProjectOperationRequest",
+      "response": "OperationStatus"
+    },
+    "organization_status": {
+      "request": "EmptyRequest",
+      "response": "Option<OperationStatus>"
+    },
+    "cancel_organization": {
+      "request": "CancelOperationRequest",
+      "response": "Cancelled"
+    },
+    "apply_organization": {
+      "request": "ApplyOrganizationRequest",
+      "response": "Snapshot"
+    },
+    "hello": {
+      "request": "HelloRequest",
+      "response": "HelloResult"
+    },
+    "capabilities": {
+      "request": "EmptyRequest",
+      "response": "Capabilities"
+    },
+    "screens": {
+      "request": "EmptyRequest",
+      "response": "Vec<CaptureScreen>"
+    },
+    "list_projects": {
+      "request": "EmptyRequest",
+      "response": "Library"
+    },
+    "open_project": {
+      "request": "OpenProjectRequest",
+      "response": "Snapshot"
+    },
+    "metadata_page": {
+      "request": "MetadataPageRequest",
+      "response": "MetadataPage"
+    },
+    "frame": {
+      "request": "FrameRequest",
+      "response": "ImageReference"
+    },
+    "edit_step": {
+      "request": "EditStepRequest",
+      "response": "Snapshot"
+    },
+    "review_step": {
+      "request": "ReviewStepRequest",
+      "response": "Snapshot"
+    },
+    "add_step": {
+      "request": "AddStepRequest",
+      "response": "Snapshot"
+    },
+    "remove_step": {
+      "request": "RemoveStepRequest",
+      "response": "Snapshot"
+    },
+    "replace_step": {
+      "request": "ReplaceStepRequest",
+      "response": "Snapshot"
+    },
+    "edit_project": {
+      "request": "EditProjectRequest",
+      "response": "Snapshot"
+    },
+    "organize": {
+      "request": "ProjectOperationRequest",
+      "response": "OperationStatus"
+    },
+    "alternatives": {
+      "request": "AlternativesRequest",
+      "response": "Suggestions"
+    },
+    "prepare_capture": {
+      "request": "PrepareCaptureRequest",
+      "response": "CapturePreparation"
+    },
+    "start_capture": {
+      "request": "StartCaptureRequest",
+      "response": "OperationStatus"
+    },
+    "operation_status": {
+      "request": "EmptyRequest",
+      "response": "Option<OperationStatus>"
+    },
+    "cancel_operation": {
+      "request": "CancelOperationRequest",
+      "response": "Cancelled"
+    },
+    "ui_preferences": {
+      "request": "EmptyRequest",
+      "response": "UiPreferences"
+    },
+    "save_ui_preferences": {
+      "request": "UiPreferences",
+      "response": "UiPreferences"
+    },
+    "model_status": {
+      "request": "EmptyRequest",
+      "response": "ModelStatus"
+    },
+    "model_select": {
+      "request": "ModelSelectRequest",
+      "response": "ModelStatus"
+    },
+    "model_release": {
+      "request": "EmptyRequest",
+      "response": "ModelStatus"
+    },
+    "model_install": {
+      "request": "EmptyRequest",
+      "response": "OperationStatus"
+    },
+    "model_verify": {
+      "request": "EmptyRequest",
+      "response": "OperationStatus"
+    },
+    "model_remove": {
+      "request": "ModelRemoveRequest",
+      "response": "OperationStatus"
+    },
+    "generate": {
+      "request": "GenerateRequest",
+      "response": "OperationStatus"
+    },
+    "export": {
+      "request": "ExportRequest",
+      "response": "OperationStatus"
+    },
+    "shutdown": {
+      "request": "EmptyRequest",
+      "response": "ShutdownResult"
+    },
+    "prompt_template": {
+      "request": "EmptyRequest",
+      "response": "PromptTemplate"
+    },
+    "save_prompt_template": {
+      "request": "SavePromptTemplateRequest",
+      "response": "PromptTemplate"
+    },
+    "reset_prompt_template": {
+      "request": "EmptyRequest",
+      "response": "PromptTemplate"
+    },
+    "render_prompt": {
+      "request": "RenderPromptRequest",
+      "response": "RenderedPrompt"
+    }
+  }
+}

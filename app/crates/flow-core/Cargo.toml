@@ -1,0 +1,12 @@
+[package]
+name = "flow-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+png.workspace = true

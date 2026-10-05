@@ -1,0 +1,37 @@
+# Consistent text checkout across Windows and future portable builds.
+* text=auto eol=lf
+*.rs text eol=lf
+*.cs text eol=lf
+*.axaml text eol=lf
+*.csproj text eol=lf
+*.props text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Never normalize binary fixtures, fonts or packaged assets.
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff2 binary
+*.zip binary
+*.exe binary
+*.dll binary
+*.pdb binary
+*.gguf binary
+
+# Upstream notice bytes are checksum-pinned; preserve verbatim.
+app/packaging/licenses/upstream/** -text
+scripts/build_minimal_ffmpeg.sh text eol=lf
+app/packaging/ffmpeg-source.lock.json text eol=lf

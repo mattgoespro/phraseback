@@ -1,0 +1,90 @@
+{
+  "title": "A calmer workspace",
+  "context": "Synthetic settings walkthrough. No personal data.",
+  "created": "2026-09-23T19:45:50",
+  "frames": [
+    {
+      "file": "frames/0000000.png",
+      "time_ms": 0
+    },
+    {
+      "file": "frames/0000001.png",
+      "time_ms": 1700
+    },
+    {
+      "file": "frames/0000002.png",
+      "time_ms": 3400
+    },
+    {
+      "file": "frames/0000003.png",
+      "time_ms": 5100
+    },
+    {
+      "file": "frames/0000004.png",
+      "time_ms": 6800
+    }
+  ],
+  "steps": [
+    {
+      "frame": 0,
+      "id": "intro",
+      "title": "Open workspace settings",
+      "action": "Open Settings in the sidebar.",
+      "result": "The workspace preferences are visible.",
+      "status": "generated",
+      "manual": false,
+      "reviewed": true,
+      "uncertainty": ""
+    },
+    {
+      "frame": 1,
+      "id": "appearance",
+      "title": "Choose dark appearance",
+      "action": "Select the Dark appearance card.",
+      "result": "Dark is highlighted as the selected appearance.",
+      "status": "generated",
+      "manual": false,
+      "reviewed": false,
+      "uncertainty": ""
+    },
+    {
+      "frame": 2,
+      "id": "validation",
+      "title": "Notice the validation message",
+      "action": "",
+      "result": "",
+      "status": "pending",
+      "manual": false,
+      "reviewed": false,
+      "uncertainty": ""
+    },
+    {
+      "frame": 3,
+      "id": "rename",
+      "title": "Name the workspace",
+      "action": "Enter Product studio as the workspace name.",
+      "result": "The name field contains Product studio.",
+      "status": "stale",
+      "manual": true,
+      "reviewed": false,
+      "uncertainty": ""
+    },
+    {
+      "frame": 4,
+      "id": "saved",
+      "title": "Save the changes",
+      "action": "Select Save changes.",
+      "result": "A confirmation says the preferences have been saved.",
+      "status": "edited",
+      "manual": true,
+      "reviewed": false,
+      "uncertainty": ""
+    }
+  ],
+  "duration_ms": 8500,
+  "width": 1440,
+  "height": 900,
+  "error": "",
+  "state": "ready",
+  "version": 1
+}

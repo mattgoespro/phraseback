@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://flow-recorder.local/contracts/protocol-v1",
+  "title": "Phraseback private stdio protocol envelopes",
+  "oneOf": [ { "$ref": "#/$defs/Request" }, { "$ref": "#/$defs/Response" }, { "$ref": "#/$defs/Notification" } ],
+  "$defs": {
+    "Request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "id", "method", "params"],
+      "properties": {
+        "protocol": { "type": "integer", "minimum": 0, "maximum": 4294967295, "x-rust": "u32", "x-csharp": "uint" },
+        "id": { "type": "integer", "minimum": 0, "maximum": 9223372036854775807, "x-rust": "u64", "x-csharp": "long" },
+        "method": { "type": "string", "x-rust": "String", "x-csharp": "string" },
+        "params": { "type": "object", "x-rust": "Value", "x-csharp": "JsonElement" }
+      }
+    },
+    "Response": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "id", "session", "result", "error"],
+      "properties": {
+        "protocol": { "type": "integer", "minimum": 0, "maximum": 4294967295, "x-rust": "u32", "x-csharp": "uint" },
+        "id": { "type": "integer", "minimum": 0, "maximum": 9223372036854775807, "x-rust": "u64", "x-csharp": "long" },
+        "session": { "type": "string", "minLength": 1, "x-rust": "String", "x-csharp": "string" },
+        "result": { "type": ["object", "array", "null"], "x-rust": "Option<Value>", "x-csharp": "JsonElement?" },
+        "error": { "anyOf": [{ "$ref": "#/$defs/Error" }, { "type": "null" }], "x-rust": "Option<Error>", "x-csharp": "EngineFailure?" }
+      },
+      "oneOf": [
+        { "properties": { "error": { "type": "null" }, "result": { "type": ["object", "array", "null"] } } },
+        { "properties": { "error": { "$ref": "#/$defs/Error" }, "result": { "type": "null" } } }
+      ]
+    },
+    "Notification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "session", "event", "data"],
+      "properties": {
+        "protocol": { "type": "integer", "minimum": 0, "maximum": 4294967295, "x-rust": "u32", "x-csharp": "uint" },
+        "session": { "type": "string", "minLength": 1, "x-rust": "String", "x-csharp": "string" },
+        "event": { "enum": ["operation_status", "operation_saved", "organization_status"], "x-rust": "String", "x-csharp": "string" },
+        "data": { "type": "object", "x-rust": "Value", "x-csharp": "JsonElement" }
+      }
+    },
+    "Error": {
+      "type": "object", "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string", "x-rust": "String", "x-csharp": "string" },
+        "message": { "type": "string", "x-rust": "String", "x-csharp": "string" }
+      }
+    }
+  }
+}

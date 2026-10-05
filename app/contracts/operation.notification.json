@@ -1,0 +1,1 @@
+{"protocol":1,"session":"golden-session","event":"operation_status","data":{"id":"golden-operation","kind":"organizing","state":"completed","progress":100,"message":"Complete","recording_id":"sample","revision":3,"finished":true,"error":null,"result":{"choices_preserved":true}}}
