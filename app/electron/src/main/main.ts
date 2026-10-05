@@ -9,7 +9,7 @@ import { validateRequest, validateResponse } from './contracts';
 import { EngineClient } from './engine-client';
 import type { EngineEvent } from '../shared/api';
 import type { CaptureArea, CaptureScreen } from '../shared/api';
-import { regionToPixels } from './capture-geometry';
+import { matchCaptureDisplay, regionToPixels } from './capture-geometry';
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'phraseback-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
@@ -188,15 +188,13 @@ function captureOutline(bounds: Electron.Rectangle): BrowserWindow[] {
 }
 
 function captureBounds(source: CaptureScreen, area: CaptureArea): Electron.Rectangle {
-  const display = screen.getAllDisplays().find(d => Math.abs(d.bounds.width * d.scaleFactor - source.width) <= 2 && Math.abs(d.bounds.height * d.scaleFactor - source.height) <= 2)
-    || screen.getPrimaryDisplay();
+  const display = matchCaptureDisplay(screen.getAllDisplays(), source, screen.getPrimaryDisplay());
   const factor = display.scaleFactor;
   return { x: Math.round(display.bounds.x + (area.left - source.left) / factor), y: Math.round(display.bounds.y + (area.top - source.top) / factor), width: Math.max(1, Math.round(area.width / factor)), height: Math.max(1, Math.round(area.height / factor)) };
 }
 
 async function chooseRegion(source: CaptureScreen): Promise<CaptureArea | null> {
-  const display = screen.getAllDisplays().find(d => Math.abs(d.bounds.width * d.scaleFactor - source.width) <= 2 && Math.abs(d.bounds.height * d.scaleFactor - source.height) <= 2)
-    || screen.getPrimaryDisplay();
+  const display = matchCaptureDisplay(screen.getAllDisplays(), source, screen.getPrimaryDisplay());
   const overlay = new BrowserWindow({ ...display.bounds, frame: false, transparent: true, alwaysOnTop: true, skipTaskbar: true, resizable: false, backgroundColor: '#00000000', webPreferences: { contextIsolation: true, sandbox: true, nodeIntegration: false } });
   const html = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;background:#0009;cursor:crosshair;overflow:hidden;font:14px Segoe UI;color:#fff"><div style="position:absolute;top:18px;left:18px;padding:9px 12px;border-radius:8px;background:#25252a">Drag a rectangle to record · Esc to cancel</div><div id="box" style="position:absolute;display:none;border:2px solid #b498f0;background:#b498f033;pointer-events:none"></div><script>let start=null;const box=document.getElementById('box');addEventListener('pointerdown',e=>{start={x:e.clientX,y:e.clientY};box.style.display='block'});addEventListener('pointermove',e=>{if(!start)return;let x=Math.min(start.x,e.clientX),y=Math.min(start.y,e.clientY),w=Math.abs(e.clientX-start.x),h=Math.abs(e.clientY-start.y);Object.assign(box.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'})});addEventListener('pointerup',e=>{if(!start)return;let x=Math.min(start.x,e.clientX),y=Math.min(start.y,e.clientY),w=Math.abs(e.clientX-start.x),h=Math.abs(e.clientY-start.y);location.href='phraseback-region://select/?x='+x+'&y='+y+'&w='+w+'&h='+h});addEventListener('keydown',e=>{if(e.key==='Escape')location.href='phraseback-region://cancel/'})</script></body></html>`;
   return new Promise(async resolve => {
