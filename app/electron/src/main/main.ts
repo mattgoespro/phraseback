@@ -10,6 +10,7 @@ import { EngineClient } from './engine-client';
 import type { EngineEvent } from '../shared/api';
 import type { CaptureArea, CaptureScreen } from '../shared/api';
 import { matchCaptureDisplay, regionToPixels } from './capture-geometry';
+import { waitUnless } from './status-wait';
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'phraseback-media', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
@@ -251,7 +252,7 @@ async function startCapture(options: { screen: CaptureScreen; area: CaptureArea;
     if (capture.stop) await request('cancel_operation', { id: operation.id });
     while (!operation.finished) {
       window.webContents.send('engine:event', { event: 'operation_status', data: operation });
-      if (!latestStatus && !statusError) await new Promise<void>(resolve => { statusWake = resolve; });
+      if (!latestStatus && !statusError) await waitUnless(() => !!(latestStatus || statusError), wake => { statusWake = wake; });
       if (statusError) throw statusError;
       const next = latestStatus!;
       latestStatus = null;
