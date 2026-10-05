@@ -73,7 +73,14 @@ impl Engine {
         if let Some(operation) = &self.operation {
             let status = operation.status();
             if status.finished && !self.operation_applied {
-                if status.kind != "opening" {
+                // Only discard the in-memory recording after workers that replace it
+                // or rewrite project.json. Model install/verify/remove and export leave
+                // the open snapshot valid; bumping the revision would make Review edits
+                // fail as stale until the user reopens.
+                if !matches!(
+                    status.kind.as_str(),
+                    "opening" | "installing" | "verifying" | "removing_model" | "exporting"
+                ) {
                     self.opened = None;
                     self.revision += 1;
                 }

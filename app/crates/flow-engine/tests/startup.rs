@@ -1,9 +1,9 @@
 use serde_json::{Value, json};
 use std::{
     fs,
-    io::Write,
+    io::{Read, Write},
     path::Path,
-    process::{Command, Stdio},
+    process::{Child, ChildStdin, ChildStdout, Command, Stdio},
     time::{Duration, Instant},
 };
 
@@ -134,4 +134,114 @@ fn marked_development_root_works_in_both_builds() {
     let response = handshake(temp.path(), temp.path(), 1, json!({}));
     assert!(response["error"].is_null(), "{response}");
     assert!(!temp.path().join("application.lock").exists());
+}
+
+struct LiveEngine {
+    child: Child,
+    stdin: ChildStdin,
+    stdout: ChildStdout,
+    next_id: u64,
+}
+
+impl LiveEngine {
+    fn launch(root: &Path, local_data: &Path) -> Self {
+        let mut child = Command::new(env!("CARGO_BIN_EXE_phraseback-engine"))
+            .args(["--data-root", root.to_str().unwrap()])
+            .env("LOCALAPPDATA", local_data)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        Self {
+            stdin: child.stdin.take().unwrap(),
+            stdout: child.stdout.take().unwrap(),
+            child,
+            next_id: 1,
+        }
+    }
+
+    fn request(&mut self, method: &str, params: Value) -> Value {
+        let id = self.next_id;
+        self.next_id += 1;
+        let body = serde_json::to_vec(&json!({"protocol":1,"id":id,"method":method,"params":params}))
+            .unwrap();
+        self.stdin
+            .write_all(&(body.len() as u32).to_le_bytes())
+            .unwrap();
+        self.stdin.write_all(&body).unwrap();
+        self.stdin.flush().unwrap();
+        let mut header = [0_u8; 4];
+        self.stdout.read_exact(&mut header).unwrap();
+        let size = u32::from_le_bytes(header) as usize;
+        let mut payload = vec![0; size];
+        self.stdout.read_exact(&mut payload).unwrap();
+        let response: Value = serde_json::from_slice(&payload).unwrap();
+        assert_eq!(response["id"], id, "{response}");
+        response
+    }
+}
+
+impl Drop for LiveEngine {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+#[test]
+fn model_file_operations_do_not_close_the_open_recording() {
+    let temp = fixture();
+    fs::write(temp.path().join(".flow-recorder-development"), b"").unwrap();
+    let recording = temp.path().join("sessions/fixture-open");
+    fs::create_dir_all(recording.join("frames")).unwrap();
+    image::RgbaImage::new(2, 2)
+        .save(recording.join("frames/0000000.png"))
+        .unwrap();
+    fs::write(
+        recording.join("project.json"),
+        serde_json::to_vec(&json!({
+            "version":1,"title":"Open recording","created":"2026-10-05T00:00:00",
+            "frames":[{"file":"frames/0000000.png","time_ms":0}],
+            "steps":[{"id":"one","frame":0,"title":"First"}],
+            "duration_ms":125,"width":2,"height":2,"state":"ready"
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+
+    let mut engine = LiveEngine::launch(temp.path(), temp.path());
+    let hello = engine.request("hello", json!({}));
+    assert!(hello["error"].is_null(), "{hello}");
+
+    let opened = engine.request(
+        "open_project",
+        json!({"recording_id":"fixture-open","paged":true}),
+    );
+    assert!(opened["error"].is_null(), "{opened}");
+    let revision = opened["result"]["revision"].as_u64().unwrap();
+
+    let started = engine.request("model_remove", json!({"confirmed":true}));
+    assert!(started["error"].is_null(), "{started}");
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        let status = engine.request("operation_status", json!({}));
+        assert!(status["error"].is_null(), "{status}");
+        if status["result"]["finished"].as_bool() == Some(true) {
+            assert_eq!(status["result"]["state"], "completed", "{status}");
+            break;
+        }
+        assert!(Instant::now() < deadline, "model_remove did not finish");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+
+    let page = engine.request(
+        "metadata_page",
+        json!({"recording_id":"fixture-open","revision":revision,"kind":"steps","offset":0}),
+    );
+    assert!(
+        page["error"].is_null(),
+        "model removal closed or invalidated the open recording: {page}"
+    );
+    assert_eq!(page["result"]["items"][0]["id"], "one");
 }
