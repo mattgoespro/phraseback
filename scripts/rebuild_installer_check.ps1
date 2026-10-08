@@ -2,9 +2,8 @@ param([Parameter(Mandatory=$true)][string]$Candidate, [string]$PreviousCandidate
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath (Split-Path $PSScriptRoot -Parent)).Path
 $package = (Resolve-Path -LiteralPath $Candidate).Path
-$rebuildRoot = [IO.Path]::GetFullPath((Join-Path $repo '.tmp/rebuild')) + [IO.Path]::DirectorySeparatorChar
 $electronRoot = [IO.Path]::GetFullPath((Join-Path $repo '.tmp/electron')) + [IO.Path]::DirectorySeparatorChar
-$allowed = if ($package.StartsWith($electronRoot, [StringComparison]::OrdinalIgnoreCase)) { $electronRoot } else { $rebuildRoot }
+$allowed = $electronRoot
 if (-not $package.StartsWith($allowed, [StringComparison]::OrdinalIgnoreCase)) { throw 'Only an isolated development candidate may be checked' }
 $installer = Join-Path $package 'Phraseback-Setup-0.2.0-win-x64.exe'
 if (-not (Test-Path -LiteralPath $installer)) { throw 'Candidate installer is missing' }
@@ -25,8 +24,9 @@ $preservedData = Join-Path $checkRoot 'data'
 New-Item -ItemType Directory -Path $preservedData | Out-Null
 # Synthetic data only: never point an installer acceptance run at the user's library.
 $env:FLOW_RECORDER_DATA = $preservedData
-if ($allowed -eq $electronRoot) {
-    $fixtureSource = Join-Path $repo 'app/fixtures/studio'
+if ((Get-Content -LiteralPath (Join-Path $package 'package-summary.json') -Raw | ConvertFrom-Json).ui -ne 'electron') { throw 'Only Electron installers are supported' }
+& {
+    $fixtureSource = Join-Path $repo 'packages/engine/fixtures/studio'
     $fixtureTarget = Join-Path $preservedData 'sessions/synthetic-settings'
     $manifest = Get-Content -LiteralPath (Join-Path $fixtureSource 'manifest.json') -Raw | ConvertFrom-Json -AsHashtable
     foreach ($entry in $manifest.GetEnumerator()) {
@@ -39,11 +39,6 @@ if ($allowed -eq $electronRoot) {
         Copy-Item -LiteralPath $sourceFile -Destination $targetFile
     }
     [IO.File]::WriteAllText((Join-Path $preservedData '.flow-recorder-development'), 'isolated installer fixture')
-} else {
-    $dotnet = Join-Path $env:LOCALAPPDATA 'FlowRecorderDev/dotnet/dotnet.exe'
-    if (-not (Test-Path -LiteralPath $dotnet)) { $dotnet = (Get-Command dotnet -ErrorAction Stop).Source }
-    & $dotnet run --project (Join-Path $repo 'app/tools/Phraseback.Tools/Phraseback.Tools.csproj') -p:RestoreLockedMode=true -- --root $repo --fixture-root $preservedData
-    if ($LASTEXITCODE -ne 0) { throw 'Synthetic recording fixture creation failed' }
 }
 $modelFixture = Join-Path $preservedData 'models/installer-preservation-fixture.bin'
 New-Item -ItemType Directory -Path (Split-Path $modelFixture -Parent) -Force | Out-Null
@@ -80,13 +75,11 @@ if ($previousPackage) {
 CheckedProcess $installer ($installArgs + ('/LOG="' + (Join-Path $checkRoot 'install.log') + '"'))
 AssertInstalledPayload $package
 if (-not $SkipNativeCapture) {
-    if ($allowed -eq $electronRoot) {
-        Push-Location (Join-Path $repo 'app/electron')
-        try {
-            & node scripts/native-smoke.mjs --packaged (Join-Path $installation 'Phraseback.exe')
-            if ($LASTEXITCODE -ne 0) { throw 'Installed Electron smoke failed' }
-        } finally { Pop-Location }
-    } else { & "$PSScriptRoot/rebuild_native_check.ps1" -PackagedPayload $installation }
+    Push-Location (Join-Path $repo 'packages/ui')
+    try {
+        & node scripts/native-smoke.mjs --packaged (Join-Path $installation 'Phraseback.exe')
+        if ($LASTEXITCODE -ne 0) { throw 'Installed Electron smoke failed' }
+    } finally { Pop-Location }
 }
 if ($previousPackage) {
     CheckedProcess (Join-Path $previousPackage 'Phraseback-Setup-0.2.0-win-x64.exe') ($installArgs + ('/LOG="' + (Join-Path $checkRoot 'rollback.log') + '"'))

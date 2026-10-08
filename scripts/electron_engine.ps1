@@ -4,7 +4,7 @@ $repo = (Resolve-Path -LiteralPath (Split-Path $PSScriptRoot -Parent)).Path
 $cargo = Join-Path $env:USERPROFILE '.cargo/bin/cargo.exe'
 if (-not (Test-Path -LiteralPath $cargo)) { throw 'Pinned Rust toolchain is unavailable.' }
 $env:CARGO_TARGET_DIR = Join-Path $repo '.tmp/rebuild/target'
-$manifest = Join-Path $repo 'app/Cargo.toml'
+$manifest = Join-Path $repo 'packages/engine/Cargo.toml'
 $toolchain = '+1.98.1-x86_64-pc-windows-msvc'
 $target = 'x86_64-pc-windows-msvc'
 function Invoke-Cargo([string[]]$Arguments) {

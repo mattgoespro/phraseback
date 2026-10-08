@@ -6,7 +6,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$pinPath = Join-Path $repo 'app/packaging/ffmpeg-source.lock.json'
+$pinPath = Join-Path $repo 'packaging/ffmpeg-source.lock.json'
 $pin = Get-Content -LiteralPath $pinPath -Raw | ConvertFrom-Json
 if (-not $SourceCache) { $SourceCache = Join-Path $repo '.tmp/rebuild/ffmpeg-source-inputs' }
 if (-not $CompilerArchive) { $CompilerArchive = Join-Path $repo '.tmp/tooling/llvm-mingw.zip' }
@@ -78,7 +78,7 @@ Get-ChildItem -LiteralPath (Join-Path $stage "$($pin.compiler.version)/x86_64-w6
 Copy-Item -LiteralPath (Join-Path $stage 'ffmpeg-7.1/COPYING.LGPLv2.1') -Destination $kit
 Copy-Item -LiteralPath (Join-Path $stage 'ffmpeg-7.1/LICENSE.md') -Destination (Join-Path $kit 'FFmpeg-LICENSE.md')
 Copy-Item -LiteralPath (Join-Path $stage 'zlib-1.3.2/zlib.h') -Destination (Join-Path $kit 'zlib-license-and-header.h')
-Copy-Item -LiteralPath (Join-Path $repo 'app/packaging/FFMPEG-SOURCE-BUILD.md') -Destination $kit
+Copy-Item -LiteralPath (Join-Path $repo 'packaging/FFMPEG-SOURCE-BUILD.md') -Destination $kit
 [ordered]@{
     candidate = $true
     redistribution_approved = $false

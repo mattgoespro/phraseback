@@ -2,86 +2,38 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start Rescore API",
+      "label": "Phraseback: Check",
       "type": "process",
-      "command": "node",
-      "args": ["--import", "tsx", "--inspect=9229", "src/index.ts"],
-      "options": {
-        "cwd": "${workspaceFolder}/apps/api"
-      },
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "rescore-api",
-        "pattern": {
-          "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s*(.*)$",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".",
-          "endsPattern": "Debugger listening"
-        }
-      }
-    },
-    {
-      "label": "Start Rescore desktop",
-      "type": "process",
-      "command": "node",
-      "args": [
-        "${workspaceFolder}/node_modules/electron-vite/bin/electron-vite.js",
-        "--inspect=9230",
-        "--sourcemap"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/apps/desktop",
-        "env": {
-          "REMOTE_DEBUGGING_PORT": "9222"
-        }
-      },
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "rescore-desktop",
-        "pattern": {
-          "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s*(.*)$",
-          "file": 1,
-          "location": 2,
-          "message": 3
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": ".",
-          "endsPattern": "DevTools listening"
-        }
-      }
-    },
-    {
-      "label": "Start Rescore debug services",
-      "dependsOrder": "parallel",
-      "dependsOn": ["Start Rescore API", "Start Rescore desktop"],
+      "command": "pwsh",
+      "args": ["-NoProfile", "-File", "${workspaceFolder}/build.ps1", "-Task", "Check"],
+      "options": { "cwd": "${workspaceFolder}" },
       "problemMatcher": []
     },
     {
-      "label": "Stop Rescore debug services",
+      "label": "Phraseback: Test",
       "type": "process",
-      "command": "${env:WINDIR}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-      "args": [
-        "-NoLogo",
-        "-NoProfile",
-        "-Command",
-        "$ports = 9229, 9230, 9222, 3847; Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $ports -contains $_.LocalPort } | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { taskkill /PID $_ /T /F }"
-      ],
+      "command": "pwsh",
+      "args": ["-NoProfile", "-File", "${workspaceFolder}/build.ps1", "-Task", "Test"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
       "problemMatcher": []
     },
     {
-      "label": "Build Rescore for Windows",
-      "type": "npm",
-      "script": "build:win",
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      }
+      "label": "Phraseback: Build",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-File", "${workspaceFolder}/build.ps1", "-Task", "Build"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Phraseback: Prototype (isolated data)",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-File", "${workspaceFolder}/build.ps1", "-Task", "Prototype"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
     }
   ]
 }

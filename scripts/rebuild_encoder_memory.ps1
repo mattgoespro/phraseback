@@ -11,7 +11,7 @@ $oldTarget = $env:CARGO_TARGET_DIR
 try {
     $env:FLOW_ENCODER_MEMORY_ROOT = $root
     $env:CARGO_TARGET_DIR = Join-Path $repo '.tmp/rebuild/target'
-    & $cargo '+1.98.1-x86_64-pc-windows-msvc' test --manifest-path app/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine recording::tests::encoder_heap_is_bounded_on_noisy_full_display_frames -- --exact --ignored
+    & $cargo '+1.98.1-x86_64-pc-windows-msvc' test --manifest-path packages/engine/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine recording::tests::encoder_heap_is_bounded_on_noisy_full_display_frames -- --exact --ignored
     if ($LASTEXITCODE -ne 0) { throw 'Encoder heap check failed' }
     $report = Get-Content -LiteralPath (Join-Path $root 'encoder-memory.json') -Raw | ConvertFrom-Json
     if (-not $report.passed -or $report.results.Count -ne 18) { throw 'Incomplete encoder evidence' }

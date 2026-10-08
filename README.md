@@ -19,9 +19,11 @@ are unchanged. Do not run two writers against the same data root.
 
 ## Develop and verify
 
-The active build needs pinned Rust 1.98.1, Node dependencies, MSVC x64, and the
+The active build needs pinned Rust 1.98.1, Node 24.20.0, MSVC x64, and the
 Windows SDK. Installer builds need the pinned Inno Setup compiler. See
-`app/tooling/README.md`.
+[Development and release](docs/DEVELOPMENT.md) for setup and validation.
+
+Install UI dependencies with `npm ci --prefix packages/ui`.
 
 ```powershell
 ./build.ps1 -Task Check
@@ -32,7 +34,7 @@ Windows SDK. Installer builds need the pinned Inno Setup compiler. See
 
 `Prototype` opens the Electron app on a verified fixture under `.tmp/`. Native
 and packaged checks use isolated data; never test against the normal library.
-See `app/electron/VALIDATION-RUNBOOK.md`.
+See [packaged validation](docs/DEVELOPMENT.md#packaged-validation).
 
 To prepare a release, run `./scripts/electron_candidate.ps1`, validate the exact
 candidate, and record acceptance. Then publish it with:
@@ -44,23 +46,23 @@ $candidate = (Get-Content .tmp/electron/latest-candidate.json -Raw | ConvertFrom
 
 Release verifies the payload and installer hashes. The previous portable app,
 installer, and metadata are retained under `reference-backups/previous-release-*`.
-The accepted Electron migration is recorded in
-`app/electron/RELEASE-ACCEPTANCE.md`.
+Release evidence is recorded in `dist/release-acceptance.json` and the matching
+package inventories.
 
 ## Source layout
 
-- `app/crates/`: Rust domain, engine, and Windows capture adapter.
-- `app/electron/`: active desktop UI, engine client, and native checks.
-- `app/contracts/`, `app/fixtures/`: shared schemas and test evidence.
-- `app/packaging/`: installer, pins, notices, and FFmpeg source materials.
-- `app/shell/`: retained Avalonia rollback source; not part of active builds.
+- `packages/engine/crates/`: Rust domain, engine, and Windows capture adapter.
+- `packages/ui/`: active desktop UI, engine client, and native checks.
+- `packages/engine/contracts/`, `packages/engine/fixtures/`: shared schemas and test evidence.
+- `packaging/`: installer, pins, notices, and FFmpeg source materials.
+- `tooling/`: Windows compiler configuration.
+- `docs/`: supported scope and development/release guidance.
 - `scripts/`: build and release validation scripts.
 
-Retired Python source remains in the verified archive at
-`../../Archives/phraseback-retired-20260927/reference-backups/`.
+The retired Avalonia source, release payloads and scripts have been removed.
 
 ## Scope
 
 Windows 11 x64, SDR display/region capture, target 8 FPS. 4K and HDR are
 outside the agreed scope. The release is unsigned; public signing and an
-automatic updater are not included. See `app/SCOPE.md` for acceptance limits.
+automatic updater are not included. See `docs/SCOPE.md` for acceptance limits.

@@ -1,10 +1,6 @@
 # Consistent text checkout across Windows and future portable builds.
 * text=auto eol=lf
 *.rs text eol=lf
-*.cs text eol=lf
-*.axaml text eol=lf
-*.csproj text eol=lf
-*.props text eol=lf
 *.toml text eol=lf
 *.lock text eol=lf
 *.json text eol=lf
@@ -31,7 +27,6 @@
 *.pdb binary
 *.gguf binary
 
-# Upstream notice bytes are checksum-pinned; preserve verbatim.
-app/packaging/licenses/upstream/** -text
+# Pinned encoder build inputs.
 scripts/build_minimal_ffmpeg.sh text eol=lf
-app/packaging/ffmpeg-source.lock.json text eol=lf
+packaging/ffmpeg-source.lock.json text eol=lf

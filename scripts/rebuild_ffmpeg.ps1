@@ -2,7 +2,7 @@
 param([string]$CacheDirectory, [switch]$Offline, [string]$BuildDirectory)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$pin = Get-Content -LiteralPath (Join-Path $repo 'app/packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
+$pin = Get-Content -LiteralPath (Join-Path $repo 'packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
 if (-not $CacheDirectory) { $CacheDirectory = Join-Path $repo '.tmp/rebuild/dependencies/ffmpeg-minimal' }
 $cache = [IO.Path]::GetFullPath($CacheDirectory)
 function Verified([string]$path, [string]$sha) {

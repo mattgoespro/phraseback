@@ -31,7 +31,7 @@
   },
   "tailwindCSS.classAttributes": ["class", "className"],
   "tailwindCSS.classFunctions": ["cn"],
-  "tailwindCSS.experimental.configFile": "apps/desktop/src/renderer/src/styles/index.css",
+  "tailwindCSS.experimental.configFile": "packages/ui/src/renderer/theme.css",
   "tailwindCSS.includeLanguages": {
     "javascript": "javascript",
     "javascriptreact": "javascript",

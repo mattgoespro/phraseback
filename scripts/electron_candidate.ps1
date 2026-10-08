@@ -1,14 +1,14 @@
 param([string]$EnginePath = '', [string]$FfmpegPath = '')
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$app = Join-Path $repo 'app/electron'
+$app = Join-Path $repo 'packages/ui'
 $source = Join-Path $repo ('.tmp/electron/package-source-' + [Guid]::NewGuid().ToString('N'))
 $out = Join-Path $repo ('.tmp/electron/package-' + [Guid]::NewGuid().ToString('N'))
 if (-not $EnginePath) {
     $cargo = Join-Path $env:USERPROFILE '.cargo/bin/cargo.exe'
     if (-not (Test-Path -LiteralPath $cargo)) { throw 'Pinned Rust toolchain is unavailable' }
     $env:CARGO_TARGET_DIR = Join-Path $repo '.tmp/rebuild/target'
-    & $cargo '+1.98.1-x86_64-pc-windows-msvc' build --manifest-path (Join-Path $repo 'app/Cargo.toml') --locked --release --target x86_64-pc-windows-msvc
+    & $cargo '+1.98.1-x86_64-pc-windows-msvc' build --manifest-path (Join-Path $repo 'packages/engine/Cargo.toml') --locked --release --target x86_64-pc-windows-msvc
     if ($LASTEXITCODE -ne 0) { throw 'MSVC release engine build failed' }
     $EnginePath = Join-Path $env:CARGO_TARGET_DIR 'x86_64-pc-windows-msvc/release/phraseback-engine.exe'
 }
@@ -16,7 +16,7 @@ if (-not $FfmpegPath) { $FfmpegPath = Join-Path $repo '.tmp/rebuild/dependencies
 $EnginePath = (Resolve-Path -LiteralPath $EnginePath).Path
 $FfmpegPath = (Resolve-Path -LiteralPath $FfmpegPath).Path
 foreach ($required in @($EnginePath,$FfmpegPath)) { if (-not (Test-Path -LiteralPath $required)) { throw "Missing package input: $required" } }
-$ffmpegPin = Get-Content -LiteralPath (Join-Path $repo 'app/packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
+$ffmpegPin = Get-Content -LiteralPath (Join-Path $repo 'packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
 if ((Get-FileHash -LiteralPath $FfmpegPath).Hash -ne $ffmpegPin.binary_sha256) { throw 'FFmpeg binary does not match the pinned source kit' }
 $sourceKit = Join-Path (Split-Path $FfmpegPath -Parent) 'corresponding-source'
 foreach ($file in $ffmpegPin.source_files) {
@@ -43,9 +43,9 @@ try {
     Copy-Item -LiteralPath $EnginePath -Destination (Join-Path $payload 'Phraseback.Engine.exe')
     Copy-Item -LiteralPath $FfmpegPath -Destination (Join-Path $payload 'ffmpeg.exe')
     Copy-Item -LiteralPath $sourceKit -Destination (Join-Path $payload 'ffmpeg-source') -Recurse
-    Copy-Item -LiteralPath (Join-Path $repo 'app/packaging/FFMPEG-SOURCE-BUILD.md') -Destination (Join-Path $payload 'ffmpeg-source/BUILD.md')
-    Copy-Item -LiteralPath (Join-Path $repo 'app/packaging/ffmpeg.lock.json') -Destination $payload
-    Copy-Item -LiteralPath (Join-Path $repo 'app/packaging/THIRD-PARTY-NOTICES-ELECTRON.md') -Destination (Join-Path $payload 'THIRD-PARTY-NOTICES.md')
+    Copy-Item -LiteralPath (Join-Path $repo 'packaging/FFMPEG-SOURCE-BUILD.md') -Destination (Join-Path $payload 'ffmpeg-source/BUILD.md')
+    Copy-Item -LiteralPath (Join-Path $repo 'packaging/ffmpeg.lock.json') -Destination $payload
+    Copy-Item -LiteralPath (Join-Path $repo 'packaging/THIRD-PARTY-NOTICES-ELECTRON.md') -Destination (Join-Path $payload 'THIRD-PARTY-NOTICES.md')
     $licenseDir = Join-Path $payload 'licenses/electron'
     New-Item -ItemType Directory -Path $licenseDir -Force | Out-Null
     foreach ($name in @('LICENSE','LICENSES.chromium.html')) { Copy-Item -LiteralPath (Join-Path $app "node_modules/electron/dist/$name") -Destination $licenseDir }
@@ -55,16 +55,16 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Rust notice inventory failed' }
     $unwind = Join-Path (Split-Path $EnginePath -Parent) 'libunwind.dll'
     if (Test-Path -LiteralPath $unwind) { Copy-Item -LiteralPath $unwind -Destination $payload }
-    Copy-Item -LiteralPath (Join-Path $repo 'app/contracts/model-presets.json') -Destination $payload
+    Copy-Item -LiteralPath (Join-Path $repo 'packages/engine/contracts/model-presets.json') -Destination $payload
     $inventory = @(Get-ChildItem -LiteralPath $payload -File -Recurse | ForEach-Object {
         @{ path = [IO.Path]::GetRelativePath($payload,$_.FullName); bytes = $_.Length; sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() }
     })
     @{ candidate = $true; redistribution_approved = $false; ui = 'electron'; engine_sha256 = (Get-FileHash -LiteralPath $EnginePath -Algorithm SHA256).Hash.ToLowerInvariant(); engine_input = $EnginePath; files = $inventory } |
         ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $out 'build-provenance.json') -Encoding utf8
     $iscc = Join-Path $repo '.tmp/tooling/inno-6.7.3/ISCC.exe'
-    $innoPin = Get-Content -LiteralPath (Join-Path $repo 'app/packaging/inno.lock.json') -Raw | ConvertFrom-Json
+    $innoPin = Get-Content -LiteralPath (Join-Path $repo 'packaging/inno.lock.json') -Raw | ConvertFrom-Json
     if (-not (Test-Path -LiteralPath $iscc) -or (Get-FileHash -LiteralPath $iscc).Hash -ne $innoPin.compiler_sha256) { throw 'Pinned Inno Setup compiler unavailable or changed' }
-    & $iscc /Qp "/DPayload=$payload" "/DOutput=$out" (Join-Path $repo 'app/packaging/Phraseback.iss')
+    & $iscc /Qp "/DPayload=$payload" "/DOutput=$out" (Join-Path $repo 'packaging/Phraseback.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Electron installer build failed' }
     $installerPath = Join-Path $out 'Phraseback-Setup-0.2.0-win-x64.exe'
     @{ candidate = $true; redistribution_approved = $false; ui = 'electron'; installer = @{ name = [IO.Path]::GetFileName($installerPath); bytes = (Get-Item -LiteralPath $installerPath).Length; sha256 = (Get-FileHash -LiteralPath $installerPath).Hash.ToLowerInvariant() }; payload_inventory = 'build-provenance.json' } |

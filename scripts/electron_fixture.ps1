@@ -5,7 +5,7 @@ if (-not $Root) { $Root = Join-Path $repo '.tmp/electron/prototype-data' }
 $rootPath = [IO.Path]::GetFullPath($Root)
 $temporaryRoot = [IO.Path]::GetFullPath((Join-Path $repo '.tmp')) + [IO.Path]::DirectorySeparatorChar
 if (-not $rootPath.StartsWith($temporaryRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'The Electron fixture must stay under the repository .tmp directory.' }
-$source = [IO.Path]::GetFullPath((Join-Path $repo 'app/fixtures/studio'))
+$source = [IO.Path]::GetFullPath((Join-Path $repo 'packages/engine/fixtures/studio'))
 $manifest = Get-Content -LiteralPath (Join-Path $source 'manifest.json') -Raw | ConvertFrom-Json -AsHashtable
 $marker = Join-Path $rootPath '.flow-recorder-development'
 if (Test-Path -LiteralPath $rootPath) {

@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $bootstrap = Join-Path $PSScriptRoot 'rebuild_ffmpeg.ps1'
-$pin = Get-Content -LiteralPath (Join-Path $repo 'app/packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
+$pin = Get-Content -LiteralPath (Join-Path $repo 'packaging/ffmpeg.lock.json') -Raw | ConvertFrom-Json
 $verified = & $bootstrap
 $scratch = Join-Path $repo ('.tmp/rebuild/ffmpeg-check-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $scratch | Out-Null
@@ -36,3 +36,4 @@ catch { $rejected = $_.Exception.Message -like '*do not match*' }
 Assert $rejected 'An unverified build must not repair the cache.'
 Assert (@(Get-ChildItem $scratch -Filter '*.download').Count -eq 0) 'Bootstrap left a partial download.'
 Write-Output 'FFmpeg bootstrap: verified import, warm offline reuse, repair, and binary/source/notice corruption rejection passed.'
+$global:LASTEXITCODE = 0 # Expected native failures above are successful rejection tests.

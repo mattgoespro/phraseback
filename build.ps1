@@ -5,7 +5,7 @@ param(
     [string]$AcceptanceFile = ''
 )
 $ErrorActionPreference = 'Stop'
-$app = Join-Path $PSScriptRoot 'app/electron'
+$app = Join-Path $PSScriptRoot 'packages/ui'
 if ($Task -eq 'Release') {
     if (-not $Candidate -or -not $AcceptanceFile) { throw 'Release needs a validated Electron candidate and its acceptance file.' }
     & (Join-Path $PSScriptRoot 'scripts/electron_release.ps1') -Candidate $Candidate -AcceptanceFile $AcceptanceFile

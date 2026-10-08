@@ -5,7 +5,7 @@ $payloadPath = (Resolve-Path -LiteralPath $Payload).Path
 $cargo = Join-Path $env:USERPROFILE '.cargo/bin/cargo.exe'
 $rustc = Join-Path $env:USERPROFILE '.cargo/bin/rustc.exe'
 $toolchain = '+1.98.1-x86_64-pc-windows-msvc'
-$metadataText = & $cargo $toolchain metadata --manifest-path (Join-Path $repo 'app/Cargo.toml') --locked --format-version 1 --filter-platform x86_64-pc-windows-msvc
+$metadataText = & $cargo $toolchain metadata --manifest-path (Join-Path $repo 'packages/engine/Cargo.toml') --locked --format-version 1 --filter-platform x86_64-pc-windows-msvc
 if ($LASTEXITCODE -ne 0) { throw 'Cannot inventory Cargo dependencies' }
 $metadata = $metadataText | ConvertFrom-Json
 $sysroot = & $rustc $toolchain --print sysroot

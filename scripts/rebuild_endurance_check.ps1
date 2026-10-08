@@ -8,7 +8,7 @@ $root = Join-Path $repo ('.tmp/rebuild/endurance-' + [Guid]::NewGuid().ToString(
 New-Item -ItemType Directory -Path $root | Out-Null
 New-Item -ItemType File -Path (Join-Path $root '.flow-recorder-development') | Out-Null
 $env:FLOW_ENDURANCE_ROOT = $root
-$buildLines = & $cargo '+1.98.1-x86_64-pc-windows-msvc' test --manifest-path app/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine --no-run --message-format=json
+$buildLines = & $cargo '+1.98.1-x86_64-pc-windows-msvc' test --manifest-path packages/engine/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine --no-run --message-format=json
 if ($LASTEXITCODE -ne 0) { throw 'Endurance test build failed' }
 $artifacts = @($buildLines | ForEach-Object { $_ | ConvertFrom-Json } | Where-Object { $_.reason -eq 'compiler-artifact' -and $_.target.name -eq 'phraseback-engine' -and $_.profile.test -and $_.executable })
 if ($artifacts.Count -ne 1) { throw 'Expected exactly one engine test executable' }

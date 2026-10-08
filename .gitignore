@@ -2,8 +2,8 @@
 /.tmp/*
 !/.tmp/.gitkeep
 /dist/
-/app/electron/node_modules/
-/app/electron/dist/
+/packages/ui/node_modules/
+/packages/ui/dist/
 /build-*/
 /dist-*/
 **/bin/
@@ -36,9 +36,9 @@ Desktop.ini
 *.p12
 *.snk
 
-# Legacy rollback material and accidental expanded Windows cache paths
+# Release backups and accidental expanded Windows cache paths
 /reference-backups/
 /%SystemDrive%/
 __pycache__/
 *.py[cod]
-# Cargo.lock, NuGet lockfiles, schemas, fixtures and vendored notices are source inputs.
+# Cargo.lock, npm lockfiles, schemas and fixtures are source inputs.

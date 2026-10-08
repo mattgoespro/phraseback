@@ -1,9 +1,9 @@
-name: Replacement verification
+name: Phraseback verification
 on:
   push:
-    paths: ['app/**', 'scripts/**', '.cargo/**', 'build.ps1', 'global.json', '.gitattributes', '.github/workflows/rebuild.yml']
+    paths: ['packages/**', 'packaging/**', 'scripts/**', '.cargo/**', 'build.ps1', '.gitattributes', '.github/workflows/rebuild.yml']
   pull_request:
-    paths: ['app/**', 'scripts/**', '.cargo/**', 'build.ps1', 'global.json', '.gitattributes', '.github/workflows/rebuild.yml']
+    paths: ['packages/**', 'packaging/**', 'scripts/**', '.cargo/**', 'build.ps1', '.gitattributes', '.github/workflows/rebuild.yml']
   workflow_dispatch:
     inputs:
       run_portable:
@@ -11,7 +11,7 @@ on:
         type: boolean
         default: false
       run_endurance:
-        description: 'Run CPU recording, encoder heap and real-decoder review checks (no desktop capture)'
+        description: 'Run optional synthetic recording and encoder heap checks'
         type: boolean
         default: false
 
@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 jobs:
-  portable-contracts:
+  contracts:
     strategy:
       fail-fast: false
       matrix:
@@ -28,15 +28,15 @@ jobs:
     timeout-minutes: 20
     env:
       CARGO_TARGET_DIR: ${{ github.workspace }}/.tmp/rebuild/target
-      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
-      FLOW_REBUILD_TEST_ROOT: ${{ github.workspace }}/.tmp/rebuild/csharp-tests
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-node@v4
         with:
-          dotnet-version: '10.0.401'
-          cache: true
-          cache-dependency-path: 'app/**/packages.lock.json'
+          node-version: '24.20.0'
+          cache: npm
+          cache-dependency-path: packages/ui/package-lock.json
+      - name: Install locked UI dependencies
+        run: npm ci --prefix packages/ui
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.98.1 --profile minimal --component rustfmt --component clippy
       - uses: actions/cache@v4
@@ -45,46 +45,40 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             .tmp/rebuild/target
-          key: ${{ runner.os }}-rust-1.98.1-${{ hashFiles('app/Cargo.lock', '.cargo/config.toml') }}
-      - name: Check shared definitions
-        run: dotnet run --project app/tools/Phraseback.Tools/Phraseback.Tools.csproj -p:RestoreLockedMode=true
+          key: ${{ runner.os }}-rust-1.98.1-${{ hashFiles('packages/engine/Cargo.lock', '.cargo/config.toml') }}
+      - name: Verify generated contracts and TypeScript
+        run: npm run check --prefix packages/ui
       - name: Rust checks
-        working-directory: app
+        working-directory: packages/engine
         run: |
           cargo fmt --all --check
           cargo clippy --locked --all-targets -- -D warnings
           cargo test --locked
           cargo build --locked
-      - name: Select test engine
+      - name: Select real test engine and install isolated fixture
         shell: pwsh
         run: |
           $suffix = if ($IsWindows) { '.exe' } else { '' }
-          "FLOW_REBUILD_ENGINE=$env:CARGO_TARGET_DIR/debug/phraseback-engine$suffix" >> $env:GITHUB_ENV
-      - name: C# client and headless UI checks
-        run: dotnet test app/shell/Phraseback.Tests/Phraseback.Tests.csproj -p:RestoreLockedMode=true --logger trx --results-directory .tmp/rebuild/reports
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: prototype-reports-${{ runner.os }}
-          path: .tmp/rebuild/reports
-          if-no-files-found: ignore
+          "PHRASEBACK_TEST_ENGINE=$env:CARGO_TARGET_DIR/debug/phraseback-engine$suffix" >> $env:GITHUB_ENV
+          ./scripts/electron_fixture.ps1
+      - name: Electron unit and real-engine contract tests
+        run: npm test --prefix packages/ui
 
   windows-package:
-    needs: [portable-contracts]
+    needs: [contracts]
     runs-on: windows-latest
     timeout-minutes: 35
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
     defaults:
       run:
         shell: pwsh
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-node@v4
         with:
-          dotnet-version: '10.0.401'
-          cache: true
-          cache-dependency-path: 'app/**/packages.lock.json'
+          node-version: '24.20.0'
+          cache: npm
+          cache-dependency-path: packages/ui/package-lock.json
+      - run: npm ci --prefix packages/ui
       - name: Install pinned Rust toolchain
         run: rustup toolchain install 1.98.1 --profile minimal
       - uses: actions/cache@v4
@@ -93,11 +87,11 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             .tmp/rebuild/target
-          key: windows-package-rust-1.98.1-${{ hashFiles('app/Cargo.lock', '.cargo/config.toml') }}
+          key: windows-package-rust-1.98.1-${{ hashFiles('packages/engine/Cargo.lock', '.cargo/config.toml') }}
       - name: Install verified Inno compiler on disposable runner
         run: |
           $ErrorActionPreference = 'Stop'
-          $pin = Get-Content app/packaging/inno.lock.json -Raw | ConvertFrom-Json
+          $pin = Get-Content packaging/inno.lock.json -Raw | ConvertFrom-Json
           $toolRoot = Join-Path $env:GITHUB_WORKSPACE '.tmp/tooling'
           New-Item -ItemType Directory -Force $toolRoot | Out-Null
           $setup = Join-Path $toolRoot 'inno-setup.exe'
@@ -112,44 +106,38 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: .tmp/rebuild/dependencies/ffmpeg-minimal
-          key: windows-minimal-encoder-${{ hashFiles('app/packaging/ffmpeg.lock.json', 'app/packaging/ffmpeg-source.lock.json', 'scripts/build_minimal_ffmpeg.sh') }}
-      - name: Build self-contained portable folder and per-user installer
-        run: ./scripts/rebuild_package.ps1
+          key: windows-minimal-encoder-${{ hashFiles('packaging/ffmpeg.lock.json', 'packaging/ffmpeg-source.lock.json', 'scripts/build_minimal_ffmpeg.sh') }}
+      - name: Verify encoder source kit and acquisition
+        run: |
+          ./scripts/rebuild_ffmpeg.ps1
+          ./scripts/test_rebuild_ffmpeg.ps1
+          ./scripts/test_rebuild_ffmpeg_source.ps1
+      - name: Build Electron portable folder and per-user installer
+        run: |
+          ./scripts/electron_candidate.ps1
+          $candidate = (Get-Content .tmp/electron/latest-candidate.json -Raw | ConvertFrom-Json).candidate
+          ./scripts/electron_verify_candidate.ps1 -Candidate $candidate
       - name: Verify release startup and handshake-before-write policy
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/.tmp/rebuild/target
-        run: cargo +1.98.1-x86_64-pc-windows-msvc test --manifest-path app/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine --test startup
-      - name: Verify dependency acquisition and license inventory
-        run: |
-          ./scripts/test_rebuild_ffmpeg.ps1
-          $candidate = Get-Content .tmp/rebuild/playground-payload.json -Raw | ConvertFrom-Json
-          ./scripts/test_rebuild_notices.ps1 -Payload $candidate.payload
+        run: cargo +1.98.1-x86_64-pc-windows-msvc test --manifest-path packages/engine/Cargo.toml --locked --release --target x86_64-pc-windows-msvc -p flow-engine --test startup
       - name: Optional synthetic recording endurance
         if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
         run: ./scripts/rebuild_endurance_check.ps1
-      - name: Optional real-decoder review endurance
-        if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
-        run: ./scripts/rebuild_review_endurance.ps1
       - name: Optional encoder heap accounting
         if: github.event_name == 'workflow_dispatch' && inputs.run_endurance
         run: ./scripts/rebuild_encoder_memory.ps1
-      # Do not publish executable artifacts while redistribution/source gates are open.
-      # Hosted build success is not native desktop or clean-machine acceptance.
+      # A hosted build does not establish native desktop acceptance or authorize release.
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: windows-package-provenance
           path: |
-            .tmp/rebuild/package-*/build-provenance.json
-            .tmp/rebuild/package-*/cargo-metadata.json
-            .tmp/rebuild/package-*/inno.lock.json
-            .tmp/rebuild/package-*/package-summary.json
-            .tmp/rebuild/package-*/runtime-imports.json
-            .tmp/rebuild/package-*/Phraseback/licenses/components.json
-            .tmp/rebuild/package-*/Phraseback/licenses/status.json
+            .tmp/electron/package-*/build-provenance.json
+            .tmp/electron/package-*/package-summary.json
+            .tmp/electron/package-*/Phraseback-win32-x64/licenses/cargo/components.json
+            .tmp/electron/package-*/Phraseback-win32-x64/licenses/npm/components.json
             .tmp/rebuild/endurance-*/*.json
             .tmp/rebuild/endurance-*/*.log
-            .tmp/rebuild/review-endurance-*/*.json
-            .tmp/rebuild/review-endurance-*/*.trx
             .tmp/rebuild/encoder-memory-*/*.json
           if-no-files-found: warn

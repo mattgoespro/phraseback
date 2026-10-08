@@ -15,7 +15,7 @@ $badCompiler = Join-Path $scratch 'invalid.zip'
 [IO.File]::WriteAllText($badCompiler, 'synthetic corrupt compiler')
 ExpectFailure { & $build -CompilerArchive $badCompiler -Offline } '*Compiler archive missing or checksum mismatch*'
 ExpectFailure { & $build -SourceCache $scratch -Offline } '*Verified source unavailable offline*'
-$pin = Get-Content (Join-Path $repo 'app/packaging/ffmpeg-source.lock.json') -Raw | ConvertFrom-Json
+$pin = Get-Content (Join-Path $repo 'packaging/ffmpeg-source.lock.json') -Raw | ConvertFrom-Json
 $badSource = Join-Path $scratch ([IO.Path]::GetFileName(([Uri]$pin.ffmpeg.url).AbsolutePath))
 [IO.File]::WriteAllText($badSource, 'synthetic corrupt source')
 ExpectFailure { & $build -SourceCache $scratch -Offline } '*Verified source unavailable offline*'
@@ -49,3 +49,4 @@ if ($BuildDirectory) {
     if ($provenance.redistribution_approved -ne $false) { throw 'Candidate must not approve its own redistribution.' }
     Write-Output 'Retained source archives, recipe, binary provenance and required source-kit notices verified.'
 }
+$global:LASTEXITCODE = 0
