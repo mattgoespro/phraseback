@@ -48,7 +48,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $repo 'packaging/THIRD-PARTY-NOTICES-ELECTRON.md') -Destination (Join-Path $payload 'THIRD-PARTY-NOTICES.md')
     $licenseDir = Join-Path $payload 'licenses/electron'
     New-Item -ItemType Directory -Path $licenseDir -Force | Out-Null
-    foreach ($name in @('LICENSE','LICENSES.chromium.html')) { Copy-Item -LiteralPath (Join-Path $app "node_modules/electron/dist/$name") -Destination $licenseDir }
+    foreach ($name in @('LICENSE','LICENSES.chromium.html')) { Copy-Item -LiteralPath (Join-Path $payload $name) -Destination $licenseDir }
     & node (Join-Path $app 'scripts/collect-notices.mjs') $payload
     if ($LASTEXITCODE -ne 0) { throw 'npm notice inventory failed' }
     & (Join-Path $repo 'scripts/electron_rust_notices.ps1') -Payload $payload
