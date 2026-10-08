@@ -164,8 +164,9 @@ impl LiveEngine {
     fn request(&mut self, method: &str, params: Value) -> Value {
         let id = self.next_id;
         self.next_id += 1;
-        let body = serde_json::to_vec(&json!({"protocol":1,"id":id,"method":method,"params":params}))
-            .unwrap();
+        let body =
+            serde_json::to_vec(&json!({"protocol":1,"id":id,"method":method,"params":params}))
+                .unwrap();
         self.stdin
             .write_all(&(body.len() as u32).to_le_bytes())
             .unwrap();
